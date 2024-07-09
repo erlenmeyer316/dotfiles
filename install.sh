@@ -53,6 +53,11 @@ archlinux_only=(
 	i3
 )
 
+# ubuntu specific packages
+ubuntu_only=(
+	apt
+)
+
 
 # gather os and version information
 if [ -f /etc/os-release ]; then
@@ -99,6 +104,17 @@ if [ "$OS" == "Arch Linux" ]; then
 
     # run setup script
     cd $SETUP_SCRIPT_FOLDER
+    ./setup_${ARCH}.sh
+fi
+
+if [ "$OS" == "Ubuntu" ]; then
+    # install ubuntu only configuration
+    for app in ${ubuntu_only[@]}; do
+       stow_package "${HOME}" "$app"   
+    done
+
+    # run setup script
+    cd $SETUP_SCRIPT_FOLDER/$VER
     ./setup_${ARCH}.sh
 fi
 
