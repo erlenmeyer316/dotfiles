@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-#
-#
-#
 
 if ! command -v brightnessctl &> /dev/null
 then
