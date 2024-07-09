@@ -1,0 +1,3 @@
+#/etc/apt/apt.conf.d/50apt-list
+DPkg::Post-Invoke { "[ -f '/home/erlenmeyer316/.config/apt/Ubuntu/22.04/packages.list' ] && rm '/home/erlenmeyer316/.config/apt/Ubuntu/22.04/packages.list'" };
+DPkg::Post-Invoke { "apt-mark showmanual > '/home/erlenmeyer316/.config/apt/Ubuntu/22.04/packages.list'" };
