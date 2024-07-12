@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+# wsl host home folder
+alias winhome="cd /mnt/c/Users/dickison.12"
+

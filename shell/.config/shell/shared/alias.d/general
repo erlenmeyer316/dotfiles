@@ -2,8 +2,7 @@
 
 # LOCATION
 
-alias dotfiles="nvim $XDG_CONFIG_HOME"
-alias config="cd $XDG_CONFIG_HOME"
+alias dotfiles="cd $XDG_CONFIG_HOME"
 alias home="cd $HOME"
 
 # BASH COMMANDS
@@ -11,4 +10,3 @@ alias home="cd $HOME"
 alias ls='ls -al --color=auto'
 alias grep='grep --color=auto'
 alias mkdir='mkdir -p'
-#alias reload='source $HOME/.bash_profile && echo "sourced $HOME/.bash_profile"'
