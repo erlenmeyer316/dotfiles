@@ -1,5 +1,6 @@
 .DS_Store
 pacman/.config/pacman/pacman.conf.orig
 w3m/.w3m/history
+tmux/.config/tmux/plugins
 ssh/.ssh
 !ssh/.ssh/config
