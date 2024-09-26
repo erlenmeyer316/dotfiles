@@ -1,0 +1,3 @@
+#/etc/apt/apt.conf.d/50apt-list
+DPkg::Post-Invoke { "[ -f '/home/erlenmeyer316/.config/apt/Debian/12/packages.list' ] && rm '/home/erlenmeyer316/.config/apt/Debian/12/packages.list'" };
+DPkg::Post-Invoke { "apt-mark showmanual > '/home/erlenmeyer316/.config/apt/Debian/12/packages.list'" };

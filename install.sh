@@ -47,8 +47,7 @@ darwin_only=(
 )
 
 # arch linux specific packages
-archlinux_only=(
-	pacman
+arch_only=(
 	wttr
 	i3
 )
@@ -58,12 +57,16 @@ ubuntu_only=(
 	apt
 )
 
+debian_only=(
+	apt
+	cura
+)
 
 # gather os and version information
 if [ -f /etc/os-release ]; then
 	# freedesktop.org and systemd
 	. /etc/os-release
-	OS=$NAME
+	OS=${NAME// GNU\/Linux/}
 	VER=$VERSION_ID
 elif type lsb_release >/dev/null 2>&1; then
 	# linuxbase.org
@@ -105,6 +108,18 @@ if [ "$OS" == "Arch Linux" ]; then
     # run setup script
     cd $SETUP_SCRIPT_FOLDER
     ./setup_${ARCH}.sh
+fi
+
+if [ "$OS" == "Debian" ]; then
+    # install debian only configuration
+    for app in ${debian_only[@]}; do
+       stow_package "${HOME}" "$app"
+    done
+
+    # run setup script
+    cd $SETUP_SCRIPT_FOLDER/$VER
+    ./setup_${ARCH}.sh
+    exi
 fi
 
 if [ "$OS" == "Ubuntu" ]; then

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Ultimaker Cura
+Exec=/usr/local/bin/cura %u
+Icon=/home/erlenmeyer316/.local/share/applications/cura-icon.png
+Comment=Ultimaker Cura is free, easy-to-use 3d printing software trusted by millions of users
+Type=Application
+Terminal=false
+Encoding=UTF-8
+StartupNotify=true
+StartupWMClass=org.ultimaker.cura
