@@ -45,12 +45,12 @@
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.git.email }} {{ keepass_dbx }} {{ kpxc.git.secret }}
       register: kpxc_git_user_email
       changed_when: false
-      #no_log: true
+      no_log: true
 
     - name: "Keepassxc | Set git_user_email"
       ansible.builtin.set_fact:
         git_user_email: "{{ kpxc_git_user_email.stdout }}"
-      #no_log: true
+      no_log: true
 
 - name: "Git | Set user.email"
   community.general.git_config:
@@ -78,12 +78,6 @@
     name: user.name
     scope: global
     value: "{{ git_username }}"
-
-      #- name: "Git | Set user.name"
-      #  community.general.git_config:
-      #    name: user.name
-      #    scope: global
-      #    value: "{{ git_user_name }}"
 
       #- name: "Git | Set user.signingkey"
       #  community.general.git_config:
