@@ -7,12 +7,7 @@
   failed_when: false
   register: keepassxc_installed
 
-- name: Debug
-  ansible.builtin.debug:
-    msg: "{{ keepassxc_installed.rc }}"
-
 - name: Register Keepassxc
   ansible.builtin.set_fact:
     keepassxc_installed: "{{ keepassxc_installed.rc == 0 }}"
 
-# ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.git.username }} {{ keepass_dbx }} {{ kpxc.git.secret }}

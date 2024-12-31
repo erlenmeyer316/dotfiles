@@ -52,13 +52,7 @@
     
     - name: Display vault path
       ansible.builtin.debug:
-        var: kpxc_vault_path
-      tags: 
-        - always
-
-    - name: Display keyfile path
-      ansible.builtin.debug:
-        var: kpxc_vault_path
+        var: keepass_dbx
       tags: 
         - always
 
