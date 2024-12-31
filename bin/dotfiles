@@ -57,17 +57,10 @@ KPXC_INSTALLED=0
 KPXC_AUTHENTICATED=0
 ID=""
 
-# source the env file
-if [ -f "${DOTFILES_ENV}" ]; then
-  set -a
-  source "${DOTFILES_ENV}"
-  set +a
-  #rm -rf "${DOTFILES_ENV}"
-else
-  printf "ANSIBLE_KEEPASS_DBX=/home/user/Passwords.kdbx\nANSIBLE_KEEPASS_PSW=secret123" >"$DOTFILES_ENV"
-fi
+#########################
+# Functions
+#########################
 
-# _header colorize the given argument with spacing
 function __task {
   # if _task is called while a task was set, complete the previous
   if [[ $TASK != "" ]]; then
@@ -78,7 +71,6 @@ function __task {
   printf "${LBLACK} [ ]  ${TASK} \n${LRED}"
 }
 
-# _cmd performs commands with error checking
 function _cmd {
   #create log if it doesn't exist
   if ! [[ -f $DOTFILES_LOG ]]; then
@@ -139,7 +131,7 @@ function debian_setup() {
       __task "Updating package repositories"
       _cmd "sudo apt-get update"
       __task "Installing dependencies"
-      _cmd "sudo apt-get install wget gnupg2 git keepassxc openssl -y"
+      _cmd "sudo apt-get install wget gnupg2 git keepassxc gnupg gpg-agent -y"
       __task "Adding Ubuntu PPA signing key"
       _cmd "wget -O- \"https://keyserver.ubuntu.com/pks/lookup?fingerprint=on&op=get&search=0x6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367\" | sudo gpg2 --dearmour -o /usr/share/keyrings/ansible-archive-keyring.gpg"
       __task "Adding Ubuntu PPA to repository list"
@@ -175,7 +167,7 @@ function ubuntu_setup() {
     __task "Updating package repositories"
     _cmd "sudo apt-get update"
     __task "Installing dependencies"
-    _cmd "sudo apt-get install -y software-properties-common git keepassxc openssl"
+    _cmd "sudo apt-get install -y software-properties-common git keepassxc openssl gnupg gpg-agent"
     __task "Adding Ubuntu PPA to repository list"
     _cmd "sudo apt-add-repository -y ppa:ansible/ansible"
     __task "Updating package repositories"
@@ -210,7 +202,7 @@ function arch_setup() {
     __task "Updating package repositories"
     _cmd "sudo pacman -Sy --noconfirm"
     __task "Installing dependencies"
-    _cmd "sudo pacman -S --noconfirm git keepassxc openssl"
+    _cmd "sudo pacman -S --noconfirm git keepassxc openssl gnupg gpg-agent"
     __task "Installing Ansible"
     _cmd "sudo pacman -S --noconfirm ansible"
     __task "Installing python3-argcomplete"
@@ -306,6 +298,33 @@ function generate_SSL() {
   fi
 }
 
+function generate_GPG() {
+  __task "Generating local GPG keys"
+
+  local name=$(get_secret "gpg" "username")
+  local email=$(get_secret "gpg" "password")
+  local password=$(get_secret "gpg" "email")
+
+  gpg --batch --passphrase "${password}" --quick-gen-key "$name <$email>" default default
+
+  gpg --list-keys
+}
+
+#########################
+# Keepassxc vault details
+#########################
+if [ -f "${DOTFILES_ENV}" ]; then
+  set -a
+  source "${DOTFILES_ENV}"
+  set +a
+  #rm -rf "${DOTFILES_ENV}"
+else
+  printf "ANSIBLE_KEEPASS_DBX=/home/user/Passwords.kdbx\nANSIBLE_KEEPASS_PSW=secret123" >"$DOTFILES_ENV"
+fi
+
+#########################
+# Determin OS
+#########################
 if [ -f /etc/os-release ]; then
   source /etc/os-release
 else
@@ -315,6 +334,9 @@ else
   fi
 fi
 
+############################
+# Run setup for detected OS
+############################
 __task "Loading Setup for detected OS: $ID"
 case $ID in
 debian)
@@ -335,6 +357,9 @@ Darwin)
   ;;
 esac
 
+#########################
+# Generate SSH keys
+#########################
 if ! [[ -f "$SSH_DIR/authorized_keys" ]]; then
   __task "Generating SSH keys"
   _cmd "mkdir -p $SSH_DIR"
@@ -343,6 +368,9 @@ if ! [[ -f "$SSH_DIR/authorized_keys" ]]; then
   _cmd "cat $SSH_DIR/id_rsa.pub >> $SSH_DIR/authorized_keys"
 fi
 
+#########################
+# Clone/update dotfiles
+#########################
 if ! [[ -d "$DOTFILES_DIR" ]]; then
   __task "Cloning repository"
   _cmd "git clone --quiet https://github.com/erlenmeyer316/dotfiles.git $DOTFILES_DIR"
@@ -351,32 +379,36 @@ else
   _cmd "git -C $DOTFILES_DIR pull --quiet"
 fi
 
+###########################
+# Enter dotfiles directory
+###########################
 pushd "$DOTFILES_DIR" 2>&1 >/dev/null
-update_ansible_galaxy $ID
 
-# No password managers are being used at this time
+update_ansible_galaxy $ID
 confirm_vault_access
 
+############################
+# Run ansible-playbook
+############################
 if [[ $KPXC_INSTALLED -eq 1 ]]; then
   if [[ $KPXC_AUTHENTICATED -eq 1 ]]; then
     printf "${OVERWRITE}${LGREEN} [✓]  ${LGREEN}Checking for Keepassxc CLI: Keepassxc Authentication successful! ☕${NC}\n"
-    #generate_SSL
-    #if ! [[ -f "$KPXC_DIR/conf" ]]; then
-    #printf "$KPXC_PW" > "$KPXC_DIR/conf.tmp"
-    #	openssl pkeyutl -encrypt -pubin -inkey "${SSL_DIR}/cert.pub" -in "${KPXC_DIR}/conf.tmp" -out "${KPXC_DIR}/conf"
-    #	rm -rf "${KPXC_DIR}/conf.tmp"
-    #fi
     ansible-playbook --extra-vars "{\"keepass_dbx\":\"${ANSIBLE_KEEPASS_DBX}\", \"keepass_psw\":\"${ANSIBLE_KEEPASS_PSW}\"}" "$DOTFILES_DIR/main.yml" "$@"
     unset $ANSIBLE_KEEPASS_DBX
     unset $ANSIBLE_KEEPASS_PSW
-    # delete vault and keyfile
   else
     printf "${OVERWRITE}${LRED} [X]  ${LRED}Checking for Keepassxc CLI: Unable to Authenticate with Keepassxc.\n      Please verify ${DOTFILES_ENV} exists and configured correctly.\n      If it does not exists, you can rerun this script to generate it.${NC}\n"
   fi
 fi
 
+###############################
+# Return to previous directory
+###############################
 popd 2>&1 >/dev/null
 
+###############################
+# Setup complete
+###############################
 if ! [[ -f "$IS_FIRST_RUN" ]]; then
   echo -e "${CHECK_MARK} ${GREEN}First run complete!${NC}"
   echo -e "${ARROW} ${CYAN}Please reboot your computer to complete the setup.${NC}"
