@@ -7,6 +7,10 @@
   failed_when: false
   register: keepassxc_installed
 
+- name: Debug
+  ansible.builtin.debug:
+    msg: {{ keepassxc_installed }}
+
 - name: Register Keepassxc
   ansible.builtin.set_fact:
     keepassxc_installed: "{{ keepassxc_installed.rc == 0 }}"
