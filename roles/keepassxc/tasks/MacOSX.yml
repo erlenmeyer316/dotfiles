@@ -3,5 +3,4 @@
   community.general.homebrew:
     pkg: 
     - keepassxc
-    - davfs2
     state: present

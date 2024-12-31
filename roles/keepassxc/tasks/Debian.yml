@@ -3,6 +3,5 @@
   ansible.builtin.apt:
     pkg: 
     - keepassxc
-    - davfs2
     state: present
   become: true

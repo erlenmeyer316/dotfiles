@@ -1,7 +1,7 @@
 ---
-- name: "keepassxc | Arch | Install keepassxc"
+- name: "davfs2 | Arch | Install davfs2"
   ansible.builtin.pacman:
     pkg: 
-    - keepassxc
+    - davfs2
     state: present
   become: true

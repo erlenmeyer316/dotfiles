@@ -12,6 +12,7 @@ default_roles:
   - tmux
   - keepassxc
   - fd-find
+  - davfs2
   #- system
   #- aldente
   #- asciiquarium
@@ -61,6 +62,13 @@ kpxc:
     secret: "git"
     email: "email"
     username: "username"
+  davfs2:
+    secret: "davfs2"
+    url: "url"
+    port: "port"
+    keepassxc_share: "keepassxc_share"
+    keepassxc_user: "keepassxc_user"
+    keepassxc_password: "keepassxc_password"
   #git_user_name: "TechDufus"
   #op:
   #git:

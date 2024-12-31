@@ -1,0 +1,6 @@
+---
+- name: "davfs2 | MacOSX | Install davfs2"
+  community.general.homebrew:
+    pkg: 
+    - davfs2
+    state: present
