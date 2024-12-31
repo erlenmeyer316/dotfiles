@@ -9,7 +9,7 @@
 
 - name: Debug
   ansible.builtin.debug:
-    msg: {{ keepassxc_installed }}
+    msg: "{{ keepassxc_installed }}"
 
 - name: Register Keepassxc
   ansible.builtin.set_fact:
