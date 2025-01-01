@@ -76,7 +76,7 @@
     - name: "Davfs2 | Copy secrets"
       ansible.builtin.template:
         dest: "{{ ansible_user_dir }}/.davfs2/secrets"
-        src: "davfs2_config"
+        src: "secrets"
         mode: "0600"
 
 
