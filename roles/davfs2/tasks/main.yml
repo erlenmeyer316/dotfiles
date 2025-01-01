@@ -21,51 +21,51 @@
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.davfs2.url }} {{ keepass_dbx }} {{ kpxc.davfs2.secret }}
       register: kpxc_davfs2_url
       changed_when: false
-      no_log: true
+      #no_log: true
     - name: "Keepassxc | Set davfs2_url"
       ansible.builtin.set_fact:
         davfs2_url: "{{ kpxc_davfs2_url.stdout }}"
-      no_log: true
+      #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.port"
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.davfs2.port }} {{ keepass_dbx }} {{ kpxc.davfs2.secret }}
       register: kpxc_davfs2_port
       changed_when: false
-      no_log: true
+      #no_log: true
     - name: "Keepassxc | Set davfs2_port"
       ansible.builtin.set_fact:
         davfs2_port: "{{ kpxc_davfs2_port.stdout }}"
-      no_log: true
+      #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.keepassxc_share"
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.davfs2.keepassxc_share }} {{ keepass_dbx }} {{ kpxc.davfs2.secret }}
       register: kpxc_davfs2_keepassxc_share
       changed_when: false
-      no_log: true
+      #no_log: true
     - name: "Keepassxc | Set keepassxc_share"
       ansible.builtin.set_fact:
         keepassxc_share: "{{ kpxc_davfs2_keepass_share.stdout }}"
-      no_log: true
+      #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.keepassxc_user"
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.davfs2.keepassxc_user }} {{ keepass_dbx }} {{ kpxc.davfs2.secret }}
       register: kpxc_davfs2_keepassxc_user
       changed_when: false
-      no_log: true
+      #no_log: true
     - name: "Keepassxc | Set keepassxc_user"
       ansible.builtin.set_fact:
         keepassxc_user: "{{ kpxc_davfs2_keepass_user.stdout }}"
-      no_log: true
+      #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.keepassxc_password"
       ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.davfs2.keepassxc_password }} {{ keepass_dbx }} {{ kpxc.davfs2.secret }}
       register: kpxc_davfs2_keepassxc_password
       changed_when: false
-      no_log: true
+      #no_log: true
     - name: "Keepassxc | Set keepassxc_password"
       ansible.builtin.set_fact:
         keepassxc_password: "{{ kpxc_davfs2_keepass_password.stdout }}"
-      no_log: true
+      #no_log: true
 
     - name: "Davfs2 | Copy user config"
       ansible.builtin.template:
