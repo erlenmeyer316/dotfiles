@@ -44,7 +44,7 @@
       #no_log: true
     - name: "Keepassxc | Set keepassxc_share"
       ansible.builtin.set_fact:
-        keepassxc_share: "{{ kpxc_davfs2_keepass_share.stdout }}"
+        keepassxc_share: "{{ kpxc_davfs2_keepassxc_share.stdout }}"
       #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.keepassxc_user"
@@ -54,7 +54,7 @@
       #no_log: true
     - name: "Keepassxc | Set keepassxc_user"
       ansible.builtin.set_fact:
-        keepassxc_user: "{{ kpxc_davfs2_keepass_user.stdout }}"
+        keepassxc_user: "{{ kpxc_davfs2_keepassxc_user.stdout }}"
       #no_log: true
 
     - name: "Keepassxc | Get kpxc.davfs2.keepassxc_password"
@@ -64,7 +64,7 @@
       #no_log: true
     - name: "Keepassxc | Set keepassxc_password"
       ansible.builtin.set_fact:
-        keepassxc_password: "{{ kpxc_davfs2_keepass_password.stdout }}"
+        keepassxc_password: "{{ kpxc_davfs2_keepassxc_password.stdout }}"
       #no_log: true
 
     - name: "Davfs2 | Copy user config"
