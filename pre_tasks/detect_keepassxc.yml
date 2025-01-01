@@ -2,7 +2,7 @@
 - name: Detect Keepassxc
   #ansible.builtin.command:
   #  cmd: which keepassxc-cli
-  ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli show -qs -a {{ kpxc.git.username }} {{ keepass_dbx }} {{ kpxc.git.secret }}
+  ansible.builtin.shell: echo "{{ keepass_psw }}" | keepassxc-cli db-info -q {{ keepass_dbx }} | grep -o {{ keepass_dbx }}
   changed_when: false
   failed_when: false
   register: keepassxc_installed
