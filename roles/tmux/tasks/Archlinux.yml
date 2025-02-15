@@ -1,6 +1,6 @@
 ---
 - name: "Tmux | {{ ansible_distribution }} | Install tmux"
-  community.general.pacman:
-    name: tmux
+  ansible.builtin.pacman:
+    name: starship
     state: present
   become: true

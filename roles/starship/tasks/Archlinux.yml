@@ -8,15 +8,7 @@
 
 - name: "curl | {{ ansible_distribution }} | Install curl"
   when: starship_installed.rc != 0
-  ansible.buildin.pacman:
-    name:
-      - curl
+  ansible.builtin.pacman:
+    name: starship
     state: present
   become: true
-
-- name: "Starship | {{ ansible_distribution }} | Install Starship"
-  when: starship_installed.rc != 0
-  ansible.builtin.shell:
-    cmd: set -o pipefail && curl -fsSL https://starship.rs/install.sh | sudo sh -s -- --force
-  args:
-    creates: /usr/local/bin/starship

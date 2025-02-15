@@ -1,6 +1,6 @@
 ---
 - name: "Fonts | Install"
-  kewlfft.aur.aur:
-    name: 
-      - fonts-powerline
+  ansible.builtin.pacman:
+    name: powerline-fonts
     state: present
+  become: true

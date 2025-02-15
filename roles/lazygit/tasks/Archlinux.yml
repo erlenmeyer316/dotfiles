@@ -1,6 +1,6 @@
 ---
-- name: "Neofetch | Arch | Install neofetch"
+- name: "Lazygit | Arch | Install Lazygit"
   ansible.builtin.pacman:
-    name: neofetch
+    name: lazygit
     state: present
   become: true

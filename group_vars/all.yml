@@ -7,6 +7,7 @@ default_roles:
   - bash
   - ranger
   - ripgrep
+  - lazygit
   - w3m
   - neovim
   - tmux

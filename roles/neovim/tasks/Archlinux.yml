@@ -1,5 +1,22 @@
 ---
-- name: "Neovim | {{ ansible_distribution }} | Install Neovim Nightly"
-  kewlfft.aur.aur:
-    name: neovim-git
+- name: "Neovim | {{ ansible_distribution }} | Install Neovim"
+  ansible.builtin.pacman:
+    name: 
+      - cmake
+      - curl
+      - pkg-config
+      - libtool
+      - unzip
+      - ansible-lint
+      - ripgrep
+      - fzf
+      - fd
+      - neovim
+      - git
+      - tar
+      - base-devel
+      - gcc-libs
+      - luarocks
+      - lazygit
     state: present
+  become: true
