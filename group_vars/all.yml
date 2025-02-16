@@ -13,7 +13,7 @@ default_roles:
   - tmux
   - keepassxc
   - fd-find
-  - davfs2
+  #- davfs2
   #- system
   #- aldente
   #- asciiquarium

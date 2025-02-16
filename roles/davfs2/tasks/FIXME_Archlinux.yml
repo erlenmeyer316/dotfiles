@@ -1,6 +1,0 @@
----
-- name: "davfs2 | Arch | Install davfs2"
-  kewlfft.aur.aur:
-    name: davfs2
-    state: present
-  become: true

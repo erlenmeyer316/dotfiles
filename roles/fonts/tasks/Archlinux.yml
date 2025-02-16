@@ -4,3 +4,10 @@
     name: powerline-fonts
     state: present
   become: true
+
+- name: "Fonts | Install"
+  kewlfft.aur.aur:
+    name: ttf-jetbrains-mono-nerd
+    use: yay
+    state: present
+  become: true 
