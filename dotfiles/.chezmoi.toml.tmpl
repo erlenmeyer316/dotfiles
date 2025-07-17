@@ -1,7 +1,9 @@
 {{- $email := promptStringOnce . "email" "Email Address" -}}
+{{- $use_secrets := promptBoolOnce . "use_secrets" "Use secrets from KeepassXC (1=yes, 0=no)?" -}}
 
 [data]
-    email = {{ $email | quote }}
+    email       = {{ $email | quote }}
+    use_secrets = {{ $use_secrets }}
 
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/dotfiles/.chezmoiscripts/install-password-manager.sh"
