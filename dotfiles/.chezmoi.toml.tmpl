@@ -4,6 +4,3 @@
 [data]
     email       = {{ $email | quote }}
     use_secrets = {{ $use_secrets }}
-
-[hooks.read-source-state.pre]
-    command = ".local/share/chezmoi/dotfiles/.chezmoiscripts/install-password-manager.sh"
