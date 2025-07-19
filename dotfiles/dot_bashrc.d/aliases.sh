@@ -16,3 +16,19 @@ alias v='nvim'
 
 # Docker
 alias d='docker'
+alias dps='docker ps'
+alias di='docker images'
+alias dstop='docker stop $(docker ps -d)'
+alias drm='docker rm $(docker ps -a -q)'
+alias drmi='docker rmi $(docker images -q)'
+alias dclean='docker system prune -af --volumes'
+alias dlog='docker logs -f'
+alias dexec='docker -exec -it'
+alias dbash='docker exec -it \"$1\" /bin/bash'
+
+# Lazy tools
+alias lz='lazygit'
+alias ld='lazydocker'
+
+# Safer deletes
+alias rm='trash-put'
