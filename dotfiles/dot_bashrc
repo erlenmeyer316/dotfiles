@@ -1,0 +1,16 @@
+#
+# ~/.bashrc
+#
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# load all modular configs
+for file in $HOME/.bashrc.d/*.sh; do
+  source "$file"
+done
+
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+PS1='[\u@\h \W]\$ '
