@@ -43,6 +43,7 @@ usage() {
    echo " -b              List included profile binaries"
    echo " -s              List included stow packages"
    echo " -l              List profiles"
+   echo " -f              Force overwrite existing files"
    echo " -q              Quiet"
 }
 
@@ -54,6 +55,7 @@ LIST_PACKAGES=0
 PROFILE=""
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 PROFILES=$(ls "${SCRIPT_DIR}/profiles")
+FORCE=0
 
 if ! command_exists "stow"; then
    print_msg "Error: stow not installed."
@@ -93,6 +95,10 @@ while [[ $# -gt 0 ]]; do
        ;;
     -s)
        LIST_PACKAGES=1
+       shift
+       ;;
+    -f)
+       FORCE=1
        shift
        ;;
     -l)
@@ -136,15 +142,15 @@ if [[ ! -z "$PROFILE" ]]; then
    do
      if [ "$QUIET" -eq "0" ]; then
        print_msg "Linking $stow_pkg configuration"
-     fi	
-     stow -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+     fi
+     if [ "$FORCE" -eq "1" ]; then
+         stow --adopt -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+     else
+         stow -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+     fi
    done
 
 
-   # for each line in the file located at $binaries
-   # run the following command
-   # sudo apt install ${line} displaying the steps
-   # and progress to the user unless $quiet=1
    if [ "$INSTALL_BINARIES" -eq "1" ]; then
      if [ "$QUIET" -eq "0" ]; then
         print_msg "Updating package repositories..."
@@ -163,6 +169,12 @@ if [[ ! -z "$PROFILE" ]]; then
          fi	
        fi
      done
+   fi
+
+   if command_exists "git"; then
+     if [ "$FORCE" -eq "1" ]; then
+        git -c "${SCRIPT_DIR}" reset --hard HEAD
+     fi
    fi
 fi
 

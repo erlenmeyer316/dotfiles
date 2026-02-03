@@ -1,5 +1,4 @@
 bash
-elinks
 fastfetch
 fzf
 git
@@ -8,6 +7,5 @@ less
 neovim
 ranger
 starship
-tmux
 trash-cli
 xdg-user-dir

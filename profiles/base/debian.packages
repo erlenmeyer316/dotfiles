@@ -3,12 +3,9 @@ git
 neovim
 build-essential
 ranger
-tmux
 starship
 fzf
 ripgrep
 xdg-user-dirs
-elinks
 fastfetch
 trash-cli
-shtab
