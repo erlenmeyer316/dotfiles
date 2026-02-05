@@ -164,10 +164,8 @@ if [[ ! -z "$PROFILE" ]]; then
 
    if command_exists "git"; then
      if [ "$FORCE" -eq "1" ]; then
-        git -c "${SCRIPT_DIR}" reset --hard
+        git -C "${SCRIPT_DIR}" reset --hard
      fi
    fi
 fi
-
-
 
