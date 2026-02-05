@@ -2,19 +2,20 @@
 
 shopt -s nullglob
 
+HELP=0
+QUIET=0
+INSTALL_BINARIES=0
+LIST_BINARIES=0
+LIST_PACKAGES=0
+PROFILE=""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+PROFILES=$(ls "${SCRIPT_DIR}/profiles")
+FORCE=0
 
-
-in_array(){
-  local needle="$1"
-  local element
-  
-  shift # shift args to iterate the array
-
-  for element in "$@"; do
-    if [[ "$element" == "$needle" ]]; then
-       return 0 
-    fi
-  done
+profile_exists() {
+  if [ -d "${SCRIPT_DIR}/profiles/${1}" ]; then
+     return 0
+  fi
   return 1
 }
 
@@ -46,16 +47,6 @@ usage() {
    echo " -f              Force overwrite existing files"
    echo " -q              Quiet"
 }
-
-HELP=0
-QUIET=0
-INSTALL_BINARIES=0
-LIST_BINARIES=0
-LIST_PACKAGES=0
-PROFILE=""
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-PROFILES=$(ls "${SCRIPT_DIR}/profiles")
-FORCE=0
 
 if ! command_exists "stow"; then
    print_msg "Error: stow not installed."
@@ -118,7 +109,7 @@ done
 
 if [[ ! -z "$PROFILE" ]]; then
    
-   if ! in_array "$PROFILE" "${PROFILES[@]}"; then
+   if ! profile_exists "$PROFILE"; then
       print_msg "Error: Profile $PROFILE does not exist."
       exit 1
    fi
@@ -173,7 +164,7 @@ if [[ ! -z "$PROFILE" ]]; then
 
    if command_exists "git"; then
      if [ "$FORCE" -eq "1" ]; then
-        git -c "${SCRIPT_DIR}" reset --hard HEAD
+        git -c "${SCRIPT_DIR}" reset --hard
      fi
    fi
 fi
