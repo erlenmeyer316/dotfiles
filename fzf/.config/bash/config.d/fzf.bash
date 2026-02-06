@@ -1,5 +1,9 @@
 if [ $(command -v "fzf") ]; then
-    eval "$(fzf --bash)"
+    if [ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]; then
+       source /usr/share/doc/fzf/examples/key-bindings.bash
+    else
+       eval "$(fzf --bash)"
+    fi
 
     if [ $(command -v "rg") ]; then
         export FZF_DEFAULT_COMMAND="rg --files --hidden --glob '!.git'"
