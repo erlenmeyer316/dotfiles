@@ -1,0 +1,9 @@
+body { background-color: #1a1a1a; color: #ddd; }
+h1, h2, h3, h4, h5, h6 { color: #96f06e; }
+a, button, input { color: #6ec8fa; font-weight: bold; }
+code { color: #EDA49; background-color: #000; }
+pre { color: #fff; background-color: #000; }
+blockquote { color: #FFC09F; }
+footer, header { background-color: #111; }
+nav { background-color: #03253A; }
+hr { color: #777; }

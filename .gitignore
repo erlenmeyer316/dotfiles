@@ -1,3 +1,4 @@
 tmux/.tmux/plugins/*
 elinks/.config/elinks/cookies
 elinks/.config/elinks/globhist
+elinks/.config/elinks/exmodehist

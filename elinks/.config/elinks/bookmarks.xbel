@@ -7,11 +7,11 @@
 
     <folder folded="yes">
         <title>Auto saved session</title>
-            <bookmark href="http://elinks.cz/">
-                <title>ELinks - Full-Featured Text WWW Browser</title>
-            </bookmark>
-
     </folder>
+
+    <bookmark href="https://thinkmoult.com/using-elinks-browse-web.html">
+        <title>Using elinks to browse the web</title>
+    </bookmark>
 
 
 </xbel>
