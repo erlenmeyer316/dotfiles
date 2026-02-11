@@ -1,0 +1,35 @@
+# No modifier key needed (we're not using shortcuts)
+set $mod Mod5
+
+# No borders, ever
+default_border none
+default_floating_border none
+hide_edge_borders both
+
+# Disable focus colors
+client.focused		#000000	#000000	#000000	#000000	#000000
+client.unfocused       	#000000	#000000	#000000	#000000	#000000
+client.focused_inactive #000000 #000000 #000000 #000000 #000000 
+client.urgent           #000000 #000000 #000000 #000000 #000000
+
+# No gaps
+gaps inner 0
+gaps outer 0
+
+# No bar
+bar {
+   mode invisible
+}
+
+# Focus follows mouse off (optional)
+focus_follows_mouse no
+
+# Launch terminal as session owner
+exec --no-startup-id sh -c 'kitty; i3-msg exit'
+
+# Force fullscreen
+for_window [class="Kitty"] fullscreen enable
+
+# Kill i3 when terminal closes
+for_window [class="Kitty"] \
+   exec --no-startup-id sh -c 'wait $(pidof kitty); i3-msg exit'
