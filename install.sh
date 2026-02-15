@@ -167,5 +167,7 @@ if [[ ! -z "$PROFILE" ]]; then
         git -C "${SCRIPT_DIR}" reset --hard
      fi
    fi
+
+   source ~/.profile
 fi
 
