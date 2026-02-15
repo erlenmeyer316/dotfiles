@@ -25,11 +25,11 @@ bar {
 focus_follows_mouse no
 
 # Launch terminal as session owner
-exec --no-startup-id sh -c 'kitty; i3-msg exit'
+exec --no-startup-id sh -c 'st; i3-msg exit'
 
 # Force fullscreen
-for_window [class="Kitty"] fullscreen enable
+for_window [class="st"] fullscreen enable
 
 # Kill i3 when terminal closes
-for_window [class="Kitty"] \
-   exec --no-startup-id sh -c 'wait $(pidof kitty); i3-msg exit'
+for_window [class="st"] \
+   exec --no-startup-id sh -c 'wait $(pidof st); i3-msg exit'
