@@ -6,5 +6,6 @@ if [ $(command -v "ranger") ]; then
             cd -- "$chosen_dir"
         fi
         rm -f -- "$temp_file"
+	clear
     }
 fi
