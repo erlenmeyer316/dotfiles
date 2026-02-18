@@ -2,23 +2,7 @@
 
 shopt -s nullglob
 
-HELP=0
-QUIET=0
-INSTALL_BINARIES=0
-LIST_BINARIES=0
-LIST_PACKAGES=0
-PROFILE=""
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-PROFILES=$(ls "${SCRIPT_DIR}/profiles")
-FORCE=0
-
-profile_exists() {
-  if [ -d "${SCRIPT_DIR}/profiles/${1}" ]; then
-     return 0
-  fi
-  return 1
-}
-
+# utility functions
 command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
@@ -30,9 +14,121 @@ package_installed() {
    return 1
 }
 
+file_exists() {
+   if [ -f "$1" ]; then
+      return 0
+   fi
+   return 1
+}
+
+list_file_contents() {
+    if file_exists "$1"; then
+         cat -n "${1}"
+    fi
+}
 
 print_msg() {
   printf "%s\n" "$1"
+}
+
+# script variables
+PROFILE=""
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+PROFILES=$(ls "${SCRIPT_DIR}/profiles")
+
+# script flags
+FORCE=0
+INSTALL_BINARIES=0
+HELP=0
+LIST_BINARIES=0
+LIST_PACKAGES=0
+QUIET=0
+
+# script functions
+profile_exists() {
+  if [ -d "${SCRIPT_DIR}/profiles/${1}" ]; then
+     return 0
+  fi
+  return 1
+}
+
+link_stow_packages() {
+   if file_exists $1; then
+      for stow_pkg in $(cat "$1")
+      do
+        if [ "$QUIET" -eq "0" ]; then
+          print_msg "Linking $stow_pkg configuration"
+        fi
+        if [ "$FORCE" -eq "1" ]; then
+            stow --adopt -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+        else
+            stow -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+        fi
+      done
+   fi
+}
+
+install_binaries() {
+   if file_exists "$1"; then
+      if [ "$QUIET" -eq "0" ]; then
+         print_msg "Updating package repositories..."
+      fi	
+      sudo apt update
+      for binary in $(cat "$1")
+      do
+        if ! package_installed "$binary"; then
+          if [ "$QUIET" -eq "0" ]; then
+            print_msg "Installing $binary.."
+          fi	
+          sudo apt-get install -y $binary
+       else
+          if [ "$QUIET" -eq "0" ]; then
+            print_msg "$binary is already installed"
+          fi	
+        fi
+      done
+   fi
+ }
+
+ install_profile_deps() {
+   if file_exists "${1}"; then
+      for profile in $(cat "$1")
+      do
+	install_profile "$profile"
+	#print_msg "$profile"
+      done
+   fi
+
+ }
+
+list_packages() {
+    print_msg "$1 includes the following configuration:"
+    list_file_contents "${SCRIPT_DIR}/profiles/${1}/stow.pkglist"
+}
+
+list_binaries(){
+    print_msg "$1 includes the following binaries:"
+    list_file_contents "${SCRIPT_DIR}/profiles/${1}/debian.pkglist"
+}
+
+install_profile() {
+   install_profile_deps "${SCRIPT_DIR}/profiles/${1}/profile.deps"
+   
+   link_stow_packages "${SCRIPT_DIR}/profiles/${1}/stow.pkglist"
+
+   if [ "$INSTALL_BINARIES" -eq "1" ]; then
+      install_binaries "${SCRIPT_DIR}/profiles/${1}/debian.pkglist"
+   fi
+
+   if command_exists "git"; then
+     if [ "$FORCE" -eq "1" ]; then
+        git -C "${SCRIPT_DIR}" reset --hard
+     fi
+   fi
+   
+   if file_exists "~/.profile"; then
+      source ~/.profile
+   fi
 }
 
 
@@ -114,60 +210,15 @@ if [[ ! -z "$PROFILE" ]]; then
       exit 1
    fi
    
-   STOW_PKGS="${SCRIPT_DIR}/profiles/${PROFILE}/stow.packages"
-   BINARIES="${SCRIPT_DIR}/profiles/${PROFILE}/debian.packages"
-
-   if [ "$LIST_PACKAGES" -eq "1" ]; then
-       print_msg "$PROFILE includes the following configuration:"
-       cat -n "${STOW_PKGS}"
-       exit 0
+    if [ "$LIST_PACKAGES" -eq "1" ]; then
+      list_packages "$PROFILE"
+      exit 0
    fi
 
    if [ "$LIST_BINARIES" -eq "1" ]; then
-       print_msg "$PROFILE includes the following binaries:"
-       cat -n "${BINARIES}"
-       exit 0
-   fi
-   
-   for stow_pkg in $(cat "$STOW_PKGS")
-   do
-     if [ "$QUIET" -eq "0" ]; then
-       print_msg "Linking $stow_pkg configuration"
-     fi
-     if [ "$FORCE" -eq "1" ]; then
-         stow --adopt -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
-     else
-         stow -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
-     fi
-   done
-
-
-   if [ "$INSTALL_BINARIES" -eq "1" ]; then
-     if [ "$QUIET" -eq "0" ]; then
-        print_msg "Updating package repositories..."
-     fi	
-     sudo apt update
-     for binary in $(cat "$BINARIES")
-     do
-       if ! package_installed "$binary"; then
-         if [ "$QUIET" -eq "0" ]; then
-           print_msg "Installing $binary.."
-         fi	
-	 sudo apt-get install -y $binary
-       else
-         if [ "$QUIET" -eq "0" ]; then
-           print_msg "$binary is already installed"
-         fi	
-       fi
-     done
+      list_binaries "$PROFILE"
+      exit 0
    fi
 
-   if command_exists "git"; then
-     if [ "$FORCE" -eq "1" ]; then
-        git -C "${SCRIPT_DIR}" reset --hard
-     fi
-   fi
-
-   source ~/.profile
+   install_profile "$PROFILE"
 fi
-
