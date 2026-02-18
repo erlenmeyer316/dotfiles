@@ -1,12 +1,8 @@
 less
-git
 neovim
-build-essential
 ranger
-starship
 fzf
 ripgrep
-xdg-user-dirs
 fastfetch
 trash-cli
 unzip

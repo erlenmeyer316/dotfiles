@@ -1,11 +1,7 @@
 bash
 fastfetch
 fzf
-git
 grep
 less
 neovim
 ranger
-starship
-trash-cli
-xdg-user-dir

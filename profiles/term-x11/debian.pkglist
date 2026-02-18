@@ -1,0 +1,8 @@
+i3
+xinit
+urxvt
+xdg-user-dirs
+libx11-dev
+libxft-dev
+libxext-dev
+libarfbuzz-dev
