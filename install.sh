@@ -33,6 +33,7 @@ print_msg() {
 
 # script variables
 PROFILE=""
+INSTALL_PROFILE=()
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 PROFILES=$(ls "${SCRIPT_DIR}/profiles")
 
@@ -90,16 +91,26 @@ install_binaries() {
    fi
  }
 
- install_profile_deps() {
-   if file_exists "${1}"; then
-      for profile in $(cat "$1")
+register_profile_deps() {
+   DEPS_FILE="${SCRIPT_DIR}/profiles/${1}/profile.deps"
+   if file_exists "${DEPS_FILE}"; then
+      for dep in $(cat "${DEPS_FILE}")
       do
-	install_profile "$profile"
-	#print_msg "$profile"
+         add=1
+	 for profile in "${INSTALL_PROFILES[@]}"
+         do
+	    if [ "$profile" == "$dep" ]; then
+	       add=0
+	    fi
+	 done
+	 if [ $add -eq 1 ]; then
+	    INSTALL_PROFILES+=("${dep}")
+	    register_profile_deps $dep
+	 fi
       done
    fi
+}
 
- }
 
 list_packages() {
     print_msg "$1 includes the following configuration:"
@@ -112,13 +123,18 @@ list_binaries(){
 }
 
 install_profile() {
-   install_profile_deps "${SCRIPT_DIR}/profiles/${1}/profile.deps"
-   
-   link_stow_packages "${SCRIPT_DIR}/profiles/${1}/stow.pkglist"
+   INSTALL_PROFILES+=("${1}")
+   register_profile_deps ${1}
+  
+   for i in "${INSTALL_PROFILES[@]}"
+   do
+      link_stow_packages "${SCRIPT_DIR}/profiles/${i}/stow.pkglist"
 
-   if [ "$INSTALL_BINARIES" -eq "1" ]; then
-      install_binaries "${SCRIPT_DIR}/profiles/${1}/debian.pkglist"
-   fi
+      if [ "$INSTALL_BINARIES" -eq "1" ]; then
+         install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
+      fi
+
+   done
 
    if command_exists "git"; then
      if [ "$FORCE" -eq "1" ]; then
@@ -190,7 +206,7 @@ while [[ $# -gt 0 ]]; do
        ;;
     -l)
       print_msg "Available profiles:"
-      print_msg "${PROFILES[@]}"
+      echo "${PROFILES[@]}"
       exit 0
       ;;
     *)
