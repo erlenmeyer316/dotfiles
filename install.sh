@@ -71,11 +71,7 @@ link_stow_packages() {
 
 install_binaries() {
    if file_exists "$1"; then
-      if [ "$QUIET" -eq "0" ]; then
-         print_msg "Updating package repositories..."
-      fi	
-      sudo apt update
-      for binary in $(cat "$1")
+     for binary in $(cat "$1")
       do
         if ! package_installed "$binary"; then
           if [ "$QUIET" -eq "0" ]; then
@@ -126,16 +122,25 @@ install_profile() {
    INSTALL_PROFILES+=("${1}")
    register_profile_deps ${1}
   
+   # link stow packages
    for i in "${INSTALL_PROFILES[@]}"
    do
       link_stow_packages "${SCRIPT_DIR}/profiles/${i}/stow.pkglist"
-
-      if [ "$INSTALL_BINARIES" -eq "1" ]; then
-         install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
-      fi
-
    done
 
+
+   if [ "$INSTALL_BINARIES" -eq "1" ]; then
+      if [ "$QUIET" -eq "0" ]; then
+         print_msg "Updating package repositories..."
+      fi	
+      sudo apt update
+      
+      for i in "${INSTALL_PROFILES[@]}"
+      do
+        install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
+      done
+   fi
+   
    if command_exists "git"; then
      if [ "$FORCE" -eq "1" ]; then
         git -C "${SCRIPT_DIR}" reset --hard
@@ -146,7 +151,6 @@ install_profile() {
       source ~/.profile
    fi
 }
-
 
 usage() {
    echo "Usage: $(basename "$0") -p [PROFILE] [-FLAG]" 
