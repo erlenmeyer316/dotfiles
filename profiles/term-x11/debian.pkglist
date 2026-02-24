@@ -4,4 +4,4 @@ xdg-user-dirs
 libx11-dev
 libxft-dev
 libxext-dev
-libarfbuzz-dev
+libharfbuzz-dev
