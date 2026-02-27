@@ -64,6 +64,13 @@ handle_extension() {
             7z l -p -- "${FILE_PATH}" && exit 5
             exit 1;;
 
+        ## Markdown
+	md)
+	    # highlight --syntax=markdown --out-format=ansi "$(FILE_PATH" && exit 5
+	    CLICOLORFORCE=1 glow -s dark "${FILE_PATH}" && exit 5
+	    # bat "${FILE_PATH}" && exit 5
+	    exit 1
+	    ;;
         ## PDF
         pdf)
             ## Preview as text conversion
