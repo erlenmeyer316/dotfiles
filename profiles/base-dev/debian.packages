@@ -2,7 +2,3 @@ git
 gh
 lazygit
 build-essential
-libx11-dev
-libxft-dev
-libxext-dev
-libharfbuzz-dev

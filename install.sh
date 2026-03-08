@@ -85,7 +85,13 @@ install_binaries() {
         fi
       done
    fi
- }
+}
+
+source_hooks() {
+   if file_exists "${SCRIPT_DIR}/profiles/${1}/hooks.sh"; then
+	source "${SCRIPT_DIR}/profiles/${1}/hooks.sh"
+   fi
+}
 
 register_profile_deps() {
    DEPS_FILE="${SCRIPT_DIR}/profiles/${1}/profile.deps"
@@ -119,9 +125,12 @@ list_binaries(){
 }
 
 install_profile() {
+   # Add the selected profile to the install tree
    INSTALL_PROFILES+=("${1}")
+
+   # Register any profile dependencies
    register_profile_deps ${1}
-  
+ 
    # link stow packages
    for i in "${INSTALL_PROFILES[@]}"
    do
@@ -129,6 +138,7 @@ install_profile() {
    done
 
 
+   # Install binary packages 
    if [ "$INSTALL_BINARIES" -eq "1" ]; then
       if [ "$QUIET" -eq "0" ]; then
          print_msg "Updating package repositories..."
@@ -138,15 +148,24 @@ install_profile() {
       for i in "${INSTALL_PROFILES[@]}"
       do
         install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
+   
+	source_hooks ${i}
+
+	if [ "$(type -t dotfiles_hook_install)" = "function" ]; then
+	    dotfiles_hook_install
+	fi
       done
    fi
+
    
+   # Replace adopted files with the files from git
    if command_exists "git"; then
      if [ "$FORCE" -eq "1" ]; then
         git -C "${SCRIPT_DIR}" reset --hard
      fi
    fi
    
+   # Reload bash profile
    if file_exists "~/.profile"; then
       source ~/.profile
    fi
