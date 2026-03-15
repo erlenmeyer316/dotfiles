@@ -95,7 +95,6 @@ install_from_source() {
 }
 
 register_profile_deps() {
-   local profile="$1"
    local deps_file="${SCRIPT_DIR}/profiles/${1}/profile.deps"
    if file_exists "${deps_file}"; then
       while IFS= read -r dep; do
