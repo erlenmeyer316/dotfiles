@@ -33,13 +33,13 @@ print_msg() {
 
 # script variables
 PROFILE=""
+INSTALL_PROFILES=()
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 mapfile -t PROFILES < <(ls "${SCRIPT_DIR}/profiles")
 
 # script flags
 FORCE=0
 INSTALL_BINARIES=0
-HELP=0
 LIST_BINARIES=0
 LIST_PACKAGES=0
 QUIET=0
@@ -53,7 +53,7 @@ profile_exists() {
 }
 
 link_stow_packages() {
-   if file_exists $1; then
+   if file_exists "$1"; then
       while IFS= read -r stow_pkg; do
         if [ "$QUIET" -eq "0" ]; then
           print_msg "Linking $stow_pkg configuration"
@@ -134,7 +134,7 @@ install_profile() {
      fi
    fi
     # Register any profile dependencies
-   register_profile_deps ${1}
+   register_profile_deps "${1}"
  
    # Add the selected profile to the install tree
    INSTALL_PROFILES+=("${1}")
@@ -244,7 +244,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 
-if [[ ! -z "$PROFILE" ]]; then
+if [[ -n "$PROFILE" ]]; then
    
    if ! profile_exists "$PROFILE"; then
       print_msg "Error: Profile $PROFILE does not exist."
