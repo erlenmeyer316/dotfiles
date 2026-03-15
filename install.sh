@@ -35,7 +35,8 @@ print_msg() {
 PROFILE=""
 INSTALL_PROFILE=()
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-PROFILES=$(ls "${SCRIPT_DIR}/profiles")
+mapfile -t PROFILES < <(ls "${SCRIPT_DIR}/profiles")
+#PROFILES=$(ls "${SCRIPT_DIR}/profiles")
 
 # script flags
 FORCE=0
@@ -55,61 +56,63 @@ profile_exists() {
 
 link_stow_packages() {
    if file_exists $1; then
-      for stow_pkg in $(cat "$1")
-      do
+      while IFS= read -r stow_pkg; do
         if [ "$QUIET" -eq "0" ]; then
           print_msg "Linking $stow_pkg configuration"
         fi
         if [ "$FORCE" -eq "1" ]; then
-            stow --adopt -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+            stow --adopt -d "${SCRIPT_DIR}" -t ~ -R $stow_pkg
         else
-            stow -d "${SCRIPT_DIR}" -t ~ -S $stow_pkg
+            stow -d "${SCRIPT_DIR}" -t ~ -R $stow_pkg
         fi
-      done
+       done < "$1"
    fi
 }
 
 install_binaries() {
    if file_exists "$1"; then
-     for binary in $(cat "$1")
-      do
-        if ! package_installed "$binary"; then
-          if [ "$QUIET" -eq "0" ]; then
-            print_msg "Installing $binary.."
-          fi	
-          sudo apt-get install -y $binary
-       else
-          if [ "$QUIET" -eq "0" ]; then
-            print_msg "$binary is already installed"
-          fi	
-        fi
-      done
+      local packages=()
+      while IFS= read -r binary; do
+       if ! package_installed "$binary"; then
+	   if [ "$QUIET" -eq 0 ]; then
+	      print_msg "Queueing $binary for install"
+	      packages+=("$binary")
+           fi
+	 else
+	   if [ "$QUIET" -eq 0 ]; then
+	      print_msg "$binary already installed"
+	   fi
+	 fi
+      done < "$1"
+      if [ ${#packages[@]} -gt 0 ]; then
+          sudo apt-get install -y "${packages[@]}"
+      fi
    fi
 }
 
-source_hooks() {
-   if file_exists "${SCRIPT_DIR}/profiles/${1}/hooks.sh"; then
-	source "${SCRIPT_DIR}/profiles/${1}/hooks.sh"
+install_from_source() {
+   if file_exists "$1"; then
+      bash "$1"
    fi
 }
 
 register_profile_deps() {
-   DEPS_FILE="${SCRIPT_DIR}/profiles/${1}/profile.deps"
-   if file_exists "${DEPS_FILE}"; then
-      for dep in $(cat "${DEPS_FILE}")
-      do
-         add=1
-	 for profile in "${INSTALL_PROFILES[@]}"
-         do
-	    if [ "$profile" == "$dep" ]; then
-	       add=0
+   local profile="$1"
+   local deps_file="${SCRIPT_DIR}/profiles/${1}/profile.deps"
+   if file_exists "${deps_file}"; then
+      while IFS= read -r dep; do
+         local already=0
+	 for p in "${INSTALL_PROFILES[@]}"; do
+	    if [ "$p" == "$dep" ]; then
+		already=1
+		break
 	    fi
 	 done
-	 if [ $add -eq 1 ]; then
-	    INSTALL_PROFILES+=("${dep}")
-	    register_profile_deps $dep
+	 if [[ $already -eq 0 ]]; then
+            INSTALL_PROFILES+=("$dep")
+	    register_profile_deps "$dep"
 	 fi
-      done
+      done < "$deps_file"
    fi
 }
 
@@ -125,13 +128,13 @@ list_binaries(){
 }
 
 install_profile() {
-   # Add the selected profile to the install tree
-   INSTALL_PROFILES+=("${1}")
-
    # Register any profile dependencies
    register_profile_deps ${1}
  
-   # link stow packages
+   # Add the selected profile to the install tree
+   INSTALL_PROFILES+=("${1}")
+
+     # link stow packages
    for i in "${INSTALL_PROFILES[@]}"
    do
       link_stow_packages "${SCRIPT_DIR}/profiles/${i}/stow.pkglist"
@@ -148,26 +151,26 @@ install_profile() {
       for i in "${INSTALL_PROFILES[@]}"
       do
         install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
-   
-	source_hooks ${i}
-
-	if [ "$(type -t dotfiles_hook_install)" = "function" ]; then
-	    dotfiles_hook_install
-	fi
+        install_from_source "${SCRIPT_DIR}/profiles/${i}/build.sh"
       done
    fi
 
    
    # Replace adopted files with the files from git
-   if command_exists "git"; then
-     if [ "$FORCE" -eq "1" ]; then
-        git -C "${SCRIPT_DIR}" reset --hard
+   if [ "$FORCE" -eq "1" ]; then
+     if ! git -C "${SCRIPT_DIR}" diff --quiet; then
+        print_msg "Error: repo has uncomitted changes. Aborting --force to avoid data loss"
+	print_msg "Review with: git -C ${SCRIPT_DIR} diff"
+	exit 1
      fi
    fi
    
-   # Reload bash profile
-   if file_exists "~/.profile"; then
-      source ~/.profile
+   # Tell user to reload the bash profile
+   if file_exists "$HOME/.profile"; then
+      print_msg ""
+      print_msg "----------------------------------------------------------------"
+      print_msg "Installation complete!"
+      print_msg "Please run the following to complete setup: 'source ~/.profile'"
    fi
 }
 
