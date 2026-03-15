@@ -33,10 +33,8 @@ print_msg() {
 
 # script variables
 PROFILE=""
-INSTALL_PROFILE=()
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 mapfile -t PROFILES < <(ls "${SCRIPT_DIR}/profiles")
-#PROFILES=$(ls "${SCRIPT_DIR}/profiles")
 
 # script flags
 FORCE=0
@@ -61,9 +59,9 @@ link_stow_packages() {
           print_msg "Linking $stow_pkg configuration"
         fi
         if [ "$FORCE" -eq "1" ]; then
-            stow --adopt -d "${SCRIPT_DIR}" -t ~ -R $stow_pkg
+            stow --adopt -d "${SCRIPT_DIR}" -t ~ -R "$stow_pkg"
         else
-            stow -d "${SCRIPT_DIR}" -t ~ -R $stow_pkg
+            stow -d "${SCRIPT_DIR}" -t ~ -R "$stow_pkg"
         fi
        done < "$1"
    fi
@@ -74,9 +72,9 @@ install_binaries() {
       local packages=()
       while IFS= read -r binary; do
        if ! package_installed "$binary"; then
+	   packages+=("$binary")
 	   if [ "$QUIET" -eq 0 ]; then
 	      print_msg "Queueing $binary for install"
-	      packages+=("$binary")
            fi
 	 else
 	   if [ "$QUIET" -eq 0 ]; then
@@ -128,18 +126,29 @@ list_binaries(){
 }
 
 install_profile() {
-   # Register any profile dependencies
+   if [ "$FORCE" -eq "1" ]; then
+     if ! git -C "${SCRIPT_DIR}" diff --quiet; then
+        print_msg "Error: repo has uncomitted changes. Aborting --force to avoid data loss"
+	print_msg "Review with: git -C ${SCRIPT_DIR} diff"
+	exit 1
+     fi
+   fi
+    # Register any profile dependencies
    register_profile_deps ${1}
  
    # Add the selected profile to the install tree
    INSTALL_PROFILES+=("${1}")
 
-     # link stow packages
+   # link stow packages
    for i in "${INSTALL_PROFILES[@]}"
    do
       link_stow_packages "${SCRIPT_DIR}/profiles/${i}/stow.pkglist"
    done
 
+   # Restore dotfile version after --adopt pulled in user files
+   if [ "$FORCE" -eq 1 ]; then
+      git -C "${SCRIPT_DIR}" reset --hard
+   fi
 
    # Install binary packages 
    if [ "$INSTALL_BINARIES" -eq "1" ]; then
@@ -153,16 +162,6 @@ install_profile() {
         install_binaries "${SCRIPT_DIR}/profiles/${i}/debian.pkglist"
         install_from_source "${SCRIPT_DIR}/profiles/${i}/build.sh"
       done
-   fi
-
-   
-   # Replace adopted files with the files from git
-   if [ "$FORCE" -eq "1" ]; then
-     if ! git -C "${SCRIPT_DIR}" diff --quiet; then
-        print_msg "Error: repo has uncomitted changes. Aborting --force to avoid data loss"
-	print_msg "Review with: git -C ${SCRIPT_DIR} diff"
-	exit 1
-     fi
    fi
    
    # Tell user to reload the bash profile
