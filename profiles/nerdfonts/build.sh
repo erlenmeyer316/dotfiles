@@ -7,6 +7,9 @@ FONT_DIR="$HOME/.fonts"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 while IFS= read -r font_name; do
+        if [[ ${font_name:0:1} == "#" ]]; then
+	   continue
+	fi
 	if fc-list --format="%{family}"\n | grep -qi "${font_name}"; then
            echo "Font ${font_name} already installed..."
 	else
