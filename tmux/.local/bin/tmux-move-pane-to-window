@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Move the current tmux pane to window <N>, creating or swapping as needed.
+# Usage: tmux-move-pane-to-window <target_index>
+
+TARGET=$1
+
+# Break current pane out into its own new window, capture its new index
+NEW=$(tmux break-pane -d -P -F '#{window_index}')
+
+# If target window already exists, swap into that slot; otherwise just move
+if tmux list-windows -F '#{window_index}' | grep -qx "$TARGET"; then
+    tmux swap-window -s "$NEW" -t ":$TARGET"
+else
+    tmux move-window -s "$NEW" -t ":$TARGET"
+fi
+
+# Follow focus to the target window
+tmux select-window -t ":$TARGET"
