@@ -11,7 +11,7 @@ while IFS= read -r font_name; do
 	   continue
 	fi
 	if fc-list --format="%{family}"\n | grep -qi "${font_name}"; then
-           echo "Font ${font_name} already installed..."
+           echo "Font ${font_name} already installed, skipping"
 	else
            curl -OL "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font_name.zip"
            mkdir -p  "${FONT_DIR}"
