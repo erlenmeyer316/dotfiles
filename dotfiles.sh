@@ -374,6 +374,10 @@ if [[ "$#" -eq 0 ]]; then
     exit 1
 fi
 
+if ! dir_exists "$HOME/.local/bin"; then
+   mkdir -p "$HOME/.local/bin"
+fi
+
 SUBCOMMAND="$1"
 shift
 
@@ -421,7 +425,7 @@ done
 # Validate all stow packages exist before doing any work
 for pkg in "${STOW_PKGS[@]}"; do
     if ! stow_pkg_exists "$pkg"; then
-        print_always "Error: stow package '${pkg}' not found in repo."
+        print_always "Error: stow package '${pkg}' does not exist."
         exit 1
     fi
 done
