@@ -5,3 +5,5 @@ libx11-dev
 libxft-dev
 libxext-dev
 libharfbuzz-dev
+xclip
+xsel
