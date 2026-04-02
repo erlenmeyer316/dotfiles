@@ -8,3 +8,6 @@ trash-cli
 unzip
 curl
 glow
+tar
+zip
+gzip
