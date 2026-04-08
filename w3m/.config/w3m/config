@@ -1,8 +1,8 @@
 # ─── Display ───────────────────────────────────────────────────────────────────
 display_link_number    1    # show [N] next to each link — closest to qutebrowser hints
 display_image          1    # inline images (requires w3m-img / X11 / sixel capable term)
-imgdisplay        w3mimgdisplay  # default image display program
-auto_image         1    # load images automatically
+#imgdisplay        w3mimgdisplay  # default image display program
+#auto_image         1    # load images automatically
 
 # ─── Rendering ─────────────────────────────────────────────────────────────────
 wrap_search        1    # search wraps around page
@@ -26,8 +26,8 @@ save_hist          1
 use_mouse          0    # we don't need it; keyboard-driven
 
 # ─── External browsers (EXTERN / EXTERN2 / EXTERN3 in keymap) ─────────────────
-extbrowser         $HOME/.config/w3m/open-lynx.sh %s    # bound to ,l below
-extbrowser2        $HOME/.config/w3m/open-browsh.sh %s  # bound to ,b below
+extbrowser         ~/.config/w3m/open-lynx.sh %s    # bound to ,l below
+extbrowser2        ~/.config/w3m/open-browsh.sh %s  # bound to ,b below
 extbrowser3        xdg-open %s               # GUI fallback (,x)
 
 # ─── Editor (for form text areas) ──────────────────────────────────────────────
