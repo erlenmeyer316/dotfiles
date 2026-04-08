@@ -79,10 +79,11 @@ keymap  yl   EXTERN_LINK "echo -n %s | xclip -selection clipboard"  # yank hover
 # ─── Open page in external browsers ────────────────────────────────────────────
 # Uses extbrowser / extbrowser2 / extbrowser3 from config
 keymap  M-l  EXTERN "$HOME/.config/w3m/open-lynx.sh $W3M_CURRENT_URL"        # alt-l: open current page in lynx
-keymap  M-b  EXTERN "$HOME/.config/w3m/open-browsh.sh $W3M_CURRENT_URL"        # alt-b: open current page in browsh
-keymap M-B EXTERN_LINK "$HOME/.config/open-browsh.sh %s"
-keymap  M-x  EXTERN "xdg-open $W3M_CURRENT_URL"        # alt-x: open in xdg-open (GUI browser)
-keymap M-X EXTERN_LINK "xdg-open %s"
+keymap  M-L  EXTERN_LINK "$HOME/.config/w3m/open-lynx.sh %s"                 # alt-L: open focused link in lynx
+keymap  M-b  EXTERN "$HOME/.config/w3m/open-browsh.sh $W3M_CURRENT_URL"      # alt-b: open current page in browsh
+keymap  M-B  EXTERN_LINK "$HOME/.config/w3m/open-browsh.sh %s"               # alt-B: open current focused link in browsh
+keymap  M-x  EXTERN "xdg-open $W3M_CURRENT_URL"                              # alt-x: open in xdg-open (GUI browser)
+keymap  M-X  EXTERN_LINK "xdg-open %s"                                       # alt-X: open current focused lin in xdg-open
 
 # ─── Source / info ─────────────────────────────────────────────────────────────
 keymap  v    VIEW    # v: view page source (qutebrowser style)
