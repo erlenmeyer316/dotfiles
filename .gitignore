@@ -1,9 +1,2 @@
 tmux/.tmux/plugins/*
-elinks/.config/elinks/cookies
-elinks/.config/elinks/globhist
-elinks/.config/elinks/exmodehist
-elinks/.config/elinks/gotohist
-elinks/.config/elinks/__pycache__
-w3m/.w3m/cookie
-w3m/.w3m/w3mcache*
 w3m/.config/w3m/cookie
