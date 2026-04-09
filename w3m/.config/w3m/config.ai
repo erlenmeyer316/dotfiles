@@ -1,0 +1,38 @@
+# ─── Display ───────────────────────────────────────────────────────────────────
+display_link_number    1    # show [N] next to each link — closest to qutebrowser hints
+#display_image          1    # inline images (requires w3m-img / X11 / sixel capable term)
+#imgdisplay        w3mimgdisplay  # default image display program
+#auto_image         1    # load images automatically
+
+# ─── Rendering ─────────────────────────────────────────────────────────────────
+wrap_search        1    # search wraps around page
+confirm_qq         1    # ask before quit
+mark_all_pages     0
+use_color          1    # enable terminal color support
+tabstop            4    # tab width
+frame              1    # enable frames
+target_self        0    # open links in same window by default
+open_tab_blank     1    # links with target=_blank open in new tab
+
+# ─── Scroll behaviour ──────────────────────────────────────────────────────────
+nextpage_topline   0    # PgDn keeps one line of context (like less)
+pixel_per_char     7    # affects image layout; tune for your font
+
+# ─── History & caching ─────────────────────────────────────────────────────────
+history            100
+save_hist          1
+
+# ─── Mouse ─────────────────────────────────────────────────────────────────────
+use_mouse          0    # we don't need it; keyboard-driven
+
+# ─── External browsers (EXTERN / EXTERN2 / EXTERN3 in keymap) ─────────────────
+extbrowser         ~/.config/w3m/open-lynx.sh %s    # bound to ,l below
+extbrowser2        ~/.config/w3m/open-browsh.sh %s  # bound to ,b below
+extbrowser3        xdg-open %s               # GUI fallback (,x)
+
+# ─── Editor (for form text areas) ──────────────────────────────────────────────
+editor             nvim
+
+# ─── Downloads ─────────────────────────────────────────────────────────────────
+# use a helper so downloads don't block the browser
+download_command   wget -c -P ~/Downloads %s &
