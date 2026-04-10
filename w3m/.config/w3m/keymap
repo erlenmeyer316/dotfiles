@@ -1,4 +1,4 @@
-# A sample of ~/.w3m/keymap (default)
+A sample of ~/.w3m/keymap (default)
 #
 # Ctrl  : C-, ^
 # Escape: ESC-, M-, ^[
@@ -139,12 +139,12 @@ keymap yl EXTERN_LINK "echo -n %s | xclip -selection clipboard" # yank hovered l
 # Open in external browser #
 ############################
 #Uses extbrowser / extbrowser2 / extbrowser3 from config
-keymap  M-l  EXTERN "$HOME/.config/w3m/open-lynx.sh $W3M_CURRENT_URL"        # alt-l: open current page in lynx
-keymap  M-L  EXTERN_LINK "$HOME/.config/w3m/open-lynx.sh %s"                 # alt-L: open focused link in lynx
-keymap  M-w  EXTERN "$HOME/.config/w3m/open-browsh.sh $W3M_CURRENT_URL"      # alt-b: open current page in browsh
-keymap  M-W  EXTERN_LINK "$HOME/.config/w3m/open-browsh.sh %s"               # alt-B: open current focused link in browsh
-keymap  M-x  EXTERN "xdg-open $W3M_CURRENT_URL"                              # alt-x: open in xdg-open (GUI browser)
-keymap  M-X  EXTERN_LINK "xdg-open %s"                                       # alt-X: open current focused lin in xdg-open
+#keymap  M-x  EXTERN "$HOME/.config/w3m/open-lynx.sh $W3M_CURRENT_URL"        # alt-l: open current page in lynx
+#keymap  M-X  EXTERN_LINK "$HOME/.config/w3m/open-lynx.sh %s"                 # alt-L: open focused link in lynx
+#keymap  M-z  EXTERN "$HOME/.config/w3m/open-browsh.sh $W3M_CURRENT_URL"      # alt-b: open current page in browsh
+#keymap  M-Z  EXTERN_LINK "$HOME/.config/w3m/open-browsh.sh %s"               # alt-B: open current focused link in browsh
+#keymap  M-x  EXTERN "xdg-open $W3M_CURRENT_URL"                              # alt-x: open in xdg-open (GUI browser)
+#keymap  M-X  EXTERN_LINK "xdg-open %s"                                       # alt-X: open current focused lin in xdg-open
 
 
 ###############
