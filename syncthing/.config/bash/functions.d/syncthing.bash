@@ -37,7 +37,7 @@ _st_curl() {
 
 # ── Public commands ───────────────────────────────────────────────────────────
 
-st_key() {
+st-key() {
    key=$(_st_key)
    echo "Device ID: ${key}"
 }
