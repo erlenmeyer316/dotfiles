@@ -2,44 +2,76 @@
 
 set -euo pipefail
 
-# install syncthing from the official apt repo if not installed 
-if [[ command -v syncthing > /dev/null 2>&1 ]]; then
-    echo "Syncthing already installed."
+NAS_DEVICE_ID="7QPLJJ2-3ZBQKPB-5OWUBZI-YF3MHST-QIRPSEC-PMNA426-FB64FU2-BOLNTQQ"
+NAS_DEVICE_NAME="DickiNas"
+SYNC_DIR="$HOME/Sync"
+CONFIG_XML="${XDG_STATE_HOME:-$HOME/.local/state}/syncthing/config.xml"
+
+# ── 1. Install ────────────────────────────────────────────────────────────────
+
+if command -v syncthing &> /dev/null; then
+    echo "[syncthing] already installed, skipping."
 else
-    # register official apt repo 
+    echo "[syncthing] installing from official apt repo..."
     if [[ ! -f /etc/apt/sources.list.d/syncthing.list ]]; then
         sudo mkdir -p /etc/apt/keyrings
         sudo curl -L -o /etc/apt/keyrings/syncthing-archive-keyring.gpg \
-		https://syncthing.net/release-key.gpg
-        echo "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable-v2" \ 
-		| sudo tee /etc/apt/sources.list.d/syncthing.list
+            https://syncthing.net/release-key.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] \
+https://apt.syncthing.net/ syncthing stable" \
+            | sudo tee /etc/apt/sources.list.d/syncthing.list
     fi
-    
-    # install syncthing
     sudo apt update && sudo apt install syncthing -y
 fi
 
-# set device name
-syncthing cli config device local name set "$(hostname)"
+# ── 2. Start daemon (must be running before CLI commands) ─────────────────────
 
-# disable usage reporting
-syncthing cli config options uracepted set -1
-
-# set default folder base path 
-mkdir -p $HOME/syncthing
-syncthing cli config defaults folder path set $HOME/syncthing
-
-# disable the browser auto-open on start
-syncthing cli config gui autoUpgradeIntervalH set 0
-
-# start background daemons if not started
-if [[ systemctl is-active --quiet syncthing ]]; then
-    echo "Syncthing daemon is already started."
+if systemctl --user is-active --quiet syncthing; then
+    echo "[syncthing] daemon already running."
 else
-    # start background daemons
+    echo "[syncthing] enabling and starting daemon..."
     systemctl --user enable syncthing
     systemctl --user start syncthing
 fi
 
-# register remote if not registered
+# Wait for the API to become ready before sending CLI commands
+echo "[syncthing] waiting for API to be ready..."
+until curl -sfk https://127.0.0.1:8384/rest/system/ping &> /dev/null; do
+    sleep 1
+done
+echo "[syncthing] API is up."
 
+# ── 3. Configure preferences ──────────────────────────────────────────────────
+
+# Name this device by its hostname
+syncthing cli config device local name set "$(hostname)"
+
+# Opt out of anonymous usage reporting
+syncthing cli config options uraccepted set -1
+
+# Disable browser auto-launch on start
+syncthing cli config gui launchBrowser set false
+
+# Create and register the default sync base directory
+mkdir -p "$SYNC_DIR"
+syncthing cli config defaults folder path set "$SYNC_DIR"
+
+# ── 4. Register NAS device (idempotent) ───────────────────────────────────────
+
+# Check if NAS is already in config before adding
+if syncthing cli config devices list | grep -q "$NAS_DEVICE_ID"; then
+    echo "[syncthing] $NAS_DEVICE_NAME already registered, skipping."
+else
+    echo "[syncthing] adding $NAS_DEVICE_NAME..."
+    syncthing cli config devices add \
+        --device-id "$NAS_DEVICE_ID" \
+        --name "$NAS_DEVICE_NAME"
+    echo "[syncthing] $NAS_DEVICE_NAME added. Go accept this device on the NAS side."
+fi
+
+# ── 5. Restart to apply config changes ───────────────────────────────────────
+
+echo "[syncthing] restarting to apply config..."
+systemctl --user restart syncthing
+
+echo "[syncthing] done. Run 'st-pending' after accepting on the NAS to see offered folders."
