@@ -34,9 +34,13 @@ else
     systemctl --user start syncthing
 fi
 
+# Get the syncthing API key
+CFG=$(echo "$CONFIG_XML")
+API_KEY=$(grep -oP '(?<=apikey>)[^<]+' "$CFG")
+
 # Wait for the API to become ready before sending CLI commands
 echo "[syncthing] waiting for API to be ready..."
-until curl -sfk https://127.0.0.1:8384/rest/system/ping &> /dev/null; do
+until curl -s -H "X-API-KEY: $API_KEY"  http://127.0.0.1:8384/rest/system/ping &> /dev/null; do
     sleep 1
 done
 echo "[syncthing] API is up."
@@ -44,13 +48,10 @@ echo "[syncthing] API is up."
 # ── 3. Configure preferences ──────────────────────────────────────────────────
 
 # Name this device by its hostname
-syncthing cli config device local name set "$(hostname)"
+syncthing cli config devices add --name "$(hostname)"
 
 # Opt out of anonymous usage reporting
-syncthing cli config options uraccepted set -1
-
-# Disable browser auto-launch on start
-syncthing cli config gui launchBrowser set false
+syncthing cli config options uraccepted set 0
 
 # Create and register the default sync base directory
 mkdir -p "$SYNC_DIR"
