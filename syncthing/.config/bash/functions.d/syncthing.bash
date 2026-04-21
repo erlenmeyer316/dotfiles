@@ -20,6 +20,10 @@ _st_key() {
   grep -oP '(?<=<apikey>)[^<]+' "$cfg"
 }
 
+_st_ping() {
+  _st_curl "/rest/noauth/health"
+}
+
 _st_curl() {
   # Wrapper: injects key, checks for empty response, returns raw JSON
   local key; key=$(_st_key) || return 1
@@ -107,3 +111,4 @@ st-watch() {
     echo "$events" | jq -r '.[] | "\(.time[:19])  \(.type)  \(.data | tostring)"'
   done
 }
+

@@ -67,6 +67,7 @@ else
     syncthing cli config devices add \
         --device-id "$NAS_DEVICE_ID" \
         --name "$NAS_DEVICE_NAME"
+    syncthing cli config devices "$NAS_DEVICE_ID" auto-accept-folders set true
     echo "[syncthing] $NAS_DEVICE_NAME added. Go accept this device on the NAS side."
 fi
 
