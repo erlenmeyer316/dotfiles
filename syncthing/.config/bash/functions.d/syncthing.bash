@@ -83,18 +83,23 @@ st-status() {
   done <<< "$ids"
 }
 
-# st-pending — show devices/folders waiting for acceptance
 st-pending() {
   echo "── Pending Devices ──────────────────────────────"
-  _st_curl /rest/config/pendingdevices \
-    | jq -r 'to_entries[] | "\(.key[:8])…  last seen: \(.value.time[:19])"' \
-    || return 1
+  local devices; devices=$(_st_curl /rest/cluster/pending/devices) || return 1
+  if [[ "$devices" == "{}" ]]; then
+    echo "  none"
+  else
+    echo "$devices" | jq -r 'to_entries[] | "\(.key)  name=\(.value.name)  addr=\(.value.address)"'
+  fi
 
   echo ""
   echo "── Pending Folders ──────────────────────────────"
-  _st_curl /rest/config/pendingfolders \
-    | jq -r 'to_entries[] | "\(.key)  offered by: \(.value.offeredBy | keys[])"' \
-    || return 1
+  local folders; folders=$(_st_curl /rest/cluster/pending/folders) || return 1
+  if [[ "$folders" == "{}" ]]; then
+    echo "  none"
+  else
+    echo "$folders" | jq -r 'to_entries[] | "\(.key)  offered by: \(.value.offeredBy | keys | join(", "))"'
+  fi
 }
 
 # st-watch — live event stream (Ctrl-C to stop)
