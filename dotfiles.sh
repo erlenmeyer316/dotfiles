@@ -26,9 +26,11 @@ list_file_contents() { file_exists "$1" && cat -n "$1"; }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
+mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setups")
 
 # Targets — populated during flag parsing
 PROFILES_INPUT=()    # profiles explicitly requested via -p
+SETUPS_INPUT=()      # setups requested via -s
 STOW_PKGS=()         # individual stow packages requested via -pkg
 INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
 
@@ -36,6 +38,22 @@ INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
 FORCE=0
 QUIET=0
 DRY_RUN=0
+
+# ===================================================================
+# Setup helpers
+# ===================================================================
+setup_exists() { dir_exists "${SCRIPT_DIR}/setups/${1}"; }
+
+run_setup() {
+    local setup_script="$1"
+    echo "${setup_script}"
+    file_exists "$setup_script" || return 0
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+        print_always "[dry-run] bash ${setup_script}"
+    else
+        bash "$setup_script"
+    fi
+}
 
 # ===================================================================
 # Profile / stow helpers
@@ -242,6 +260,14 @@ cmd_unlink() {
     _do_unlink
 }
 
+cmd_setup(){
+   print_msg ""
+   for setup in "${SETUPS_INPUT[@]}"; do
+       print_msg "Executing setup routines for: ${setup}"
+       run_setup "${SCRIPT_DIR}/setups/${setup}/setup.sh"
+   done
+}
+
 cmd_install() {
     # install implies link — symlinks are always set up first
     _do_link
@@ -276,6 +302,10 @@ cmd_list() {
     local sub="$1"
 
     case "$sub" in
+	setups)
+	    print_always "Available setups:"
+	    printf "  %s\n" "${ALL_SETUPS[@]}"
+	    ;;
         profiles)
             print_always "Available profiles:"
             printf "  %s\n" "${ALL_PROFILES[@]}"
@@ -324,15 +354,17 @@ usage() {
 Usage: $(basename "$0") <subcommand> [targets] [options]
 
 Subcommands:
-  link      Symlink dotfiles via stow (no apt)
-  unlink    Remove stow symlinks (no apt)
-  install   Symlink dotfiles + install apt packages  (implies link)
-  remove    Remove stow symlinks + remove apt packages  (always prompts)
-  list      Query profiles and packages
+  link      Symlink dotfiles via stow 
+  unlink    Remove stow symlinks 
+  install   Symlink dotfiles + install apt packages
+  setup     Apply a setup configuration
+  remove    Remove stow symlinks + remove apt packages
+  list      Query profiles, packages + setups
 
 Targets (repeatable, combinable):
   -p  PROFILE   Operate on a profile (resolves dependencies)
   -pkg PKG      Operate on a single stow package
+  -s SETUP      Operate on a single setup
 
 Options:
   -f    Force overwrite existing dotfiles (stow --adopt + git reset)
@@ -342,6 +374,7 @@ Options:
 
 List usage:
   $(basename "$0") list profiles
+  $(basename "$0") list setups
   $(basename "$0") list packages  -p PROFILE [-p PROFILE ...]
   $(basename "$0") list packages  -pkg PKG   [-pkg PKG ...]
   $(basename "$0") list binaries  -p PROFILE [-p PROFILE ...]
@@ -352,6 +385,7 @@ Examples:
   $(basename "$0") link    -pkg ranger -pkg tmux
   $(basename "$0") unlink  -p term-x11
   $(basename "$0") remove  -p dev-tools
+  $(basename "$0") setup   -s syncthing
   $(basename "$0") list    profiles
   $(basename "$0") list    packages -p base
   $(basename "$0") list    binaries -p term
@@ -396,6 +430,11 @@ while [[ $# -gt 0 ]]; do
             PROFILES_INPUT+=("$2")
             shift 2
             ;;
+        -s)
+	    [[ -z "${2:-}" ]] && { print_always "Error: -s requires an argument."; exit 1; }
+            SETUPS_INPUT+=("$2")
+            shift 2
+ 	    ;;
         -pkg)
             [[ -z "${2:-}" ]] && { print_always "Error: -pkg requires an argument."; exit 1; }
             STOW_PKGS+=("$2")
@@ -430,16 +469,40 @@ for pkg in "${STOW_PKGS[@]}"; do
     fi
 done
 
+# Validate all setups exist before doing any work
+for setup in "${SETUPS_INPUT[@]}"; do
+    if ! setup_exists "$setup"; then
+        print_always "Error: setup '${setup}' does not exist."
+	exit 1
+    fi
+done
+
 # Require at least one target for action subcommands
 case "$SUBCOMMAND" in
-    link|unlink|install|remove)
-        if [[ ${#PROFILES_INPUT[@]} -eq 0 && ${#STOW_PKGS[@]} -eq 0 ]]; then
-            print_always "Error: '${SUBCOMMAND}' requires at least one -p or -pkg target."
-            print_always ""
-            usage
-            exit 1
-        fi
-        ;;
+    link|unlink)
+         if [[  ${#STOW_PKGS[@]} -eq 0  ]]; then
+	     print_always "Error: '${SUBCOMMAND}' requires at least one -pkg target."
+             print_always ""
+             usage
+             exit 1
+         fi
+         ;;
+    install|remove)
+         if [[ ${#PROFILES_INPUT[@]} -eq 0 ]]; then
+             print_always "Error: '${SUBCOMMAND}' requires at least one -p target."
+             print_always ""
+             usage
+             exit 1
+         fi
+         ;;
+    setup)
+         if [[ ${#SETUPS_INPUT[@]} -eq 0 ]]; then
+             print_always "Error: '${SUBCOMMAND}' requires at least one -s target."
+             print_always ""
+             usage
+             exit 1
+         fi
+         ;;
 esac
 
 # Dispatch
@@ -447,6 +510,7 @@ case "$SUBCOMMAND" in
     link)    cmd_link ;;
     unlink)  cmd_unlink ;;
     install) cmd_install ;;
+    setup)   cmd_setup ;;
     remove)  cmd_remove ;;
     list)    cmd_list "$LIST_SUB" ;;
     -h|--help) usage; exit 0 ;;
