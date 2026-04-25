@@ -1,0 +1,4 @@
+KP_DB="${HOME}/Sync/keepassxc/Passwords.kdbx"
+KP_CLIP_TIMEOUT=10
+KP_KEYRING_SERVICE="kp"
+KP_KEYRING_ACCOUNT="master"
