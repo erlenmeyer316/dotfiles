@@ -25,6 +25,7 @@ list_file_contents() { file_exists "$1" && cat -n "$1"; }
 # ===================================================================
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+STOW_DIR="${SCRIPT_DIR}/stow"
 mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
 mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setups")
 
@@ -61,7 +62,7 @@ run_setup() {
 
 profile_exists() { dir_exists "${SCRIPT_DIR}/profiles/${1}"; }
 
-stow_pkg_exists() { dir_exists "${SCRIPT_DIR}/${1}"; }
+stow_pkg_exists() { dir_exists "${STOW_DIR}/${1}"; }
 
 # Recursively resolve profile deps into INSTALL_PROFILES (deps first)
 register_profile_deps() {
@@ -101,9 +102,9 @@ run_stow() {
         return
     fi
     if [[ "$FORCE" -eq 1 ]]; then
-        stow --adopt -d "${SCRIPT_DIR}" -t ~ "${action}" "$pkg"
+        stow --adopt -d "${STOW_DIR}" -t ~ "${action}" "$pkg"
     else
-        stow -d "${SCRIPT_DIR}" -t ~ "${action}" "$pkg"
+        stow -d "${STOW_DIR}" -t ~ "${action}" "$pkg"
     fi
 }
 
@@ -318,8 +319,8 @@ cmd_list() {
             done
             for pkg in "${STOW_PKGS[@]}"; do
                 print_always "Package '${pkg}':"
-                if dir_exists "${SCRIPT_DIR}/${pkg}"; then
-                    ls "${SCRIPT_DIR}/${pkg}"
+                if dir_exists "${STOW_DIR}/${pkg}"; then
+                    ls "${STOW_DIR}/${pkg}"
                 else
                     print_always "  (not found in repo)"
                 fi
