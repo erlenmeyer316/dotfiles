@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# kp — keepassxc-cli wrapper
+# Deps: keepassxc-cli, libsecret-tools (secret-tool), fzf, xclip/xsel
+
+set -euo pipefail
+
+# Source shared library
+_KP_CORE="${XDG_CONFIG_HOME:-$HOME/.config}/kp/kp-core.sh"
+if [[ ! -f "$_KP_CORE" ]]; then
+    echo "kp: core library not found at $_KP_CORE" >&2
+    exit 1
+fi
+source "$_KP_CORE"
+
+# ── Commands ──────────────────────────────────────────────────────────────────
+
+cmd_get() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_field_password "$entry"
+}
+
+cmd_user() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_field_username "$entry"
+}
+
+cmd_totp() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_field_totp "$entry"
+}
+
+cmd_url() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_field_url "$entry"
+}
+
+cmd_show() {
+    # All fields, password redacted — safe for terminal display
+    local entry="${1:-$(_kp_pick)}"
+    _kp_cli show "$KP_DB" "$entry"
+}
+
+cmd_clip() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_clip "$(_kp_field_password "$entry")"
+}
+
+cmd_clip_user() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_clip "$(_kp_field_username "$entry")"
+}
+
+cmd_clip_totp() {
+    local entry="${1:-$(_kp_pick)}"
+    _kp_clip "$(_kp_field_totp "$entry")"
+}
+
+cmd_unlock() {
+    _kp_get_master > /dev/null && echo "kp: unlocked."
+}
+
+cmd_lock() {
+    if command -v secret-tool &>/dev/null; then
+        secret-tool clear "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null
+        echo "kp: keyring cache cleared."
+    else
+        echo "kp: no keyring backend; unset KP_PASS if set manually." >&2
+    fi
+}
+
+# ── Usage ─────────────────────────────────────────────────────────────────────
+
+usage() {
+    cat <<EOF
+kp — keepassxc-cli wrapper
+
+Usage: kp <command> [entry]
+
+  get        [entry]   print password to stdout
+  user       [entry]   print username to stdout
+  totp       [entry]   print TOTP code to stdout
+  url        [entry]   print URL to stdout
+  show       [entry]   show all fields (password redacted)
+  clip       [entry]   copy password to clipboard (auto-clears)
+  clip-user  [entry]   copy username to clipboard
+  clip-totp  [entry]   copy TOTP to clipboard
+  unlock               pre-warm keyring cache
+  lock                 clear keyring cache
+
+Omitting [entry] opens an fzf picker.
+
+Config: \${XDG_CONFIG_HOME:-~/.config}/kp/config
+Overrides: KP_DB, KP_PASS, KP_CLIP_TIMEOUT
+EOF
+}
+
+# ── Dispatch ──────────────────────────────────────────────────────────────────
+
+case "${1:-}" in
+    get)        cmd_get       "${2:-}" ;;
+    user)       cmd_user      "${2:-}" ;;
+    totp)       cmd_totp      "${2:-}" ;;
+    url)        cmd_url       "${2:-}" ;;
+    show)       cmd_show      "${2:-}" ;;
+    clip)       cmd_clip      "${2:-}" ;;
+    clip-user)  cmd_clip_user "${2:-}" ;;
+    clip-totp)  cmd_clip_totp "${2:-}" ;;
+    unlock)     cmd_unlock ;;
+    lock)       cmd_lock ;;
+    *)          usage ;;
+esac
