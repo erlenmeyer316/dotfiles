@@ -33,6 +33,9 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/grep/.config/bash/
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/i3-kiosk/.config/i3/config
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/i3-kiosk/.xinitrc
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keepassxc/.config/bash/aliases.d/keepassxc.bash
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keepassxc/.config/kp/config
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keepassxc/.config/kp/kp-core.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keepassxc/.local/bin/kp
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keybinds.md
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lazygit/.config/bash/aliases.d/lazygit.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lazygit/.config/lazygit/config.yml
