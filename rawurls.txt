@@ -28,7 +28,7 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/fastfetch/.config/
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/fzf/.config/bash/config.d/fzf.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/git/.config/bash/functions.d/git.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/git/.gitconfig
-https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/git/.local/bin/get_github_raw_urls.py
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/git/.local/bin/github_raw_urls
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/grep/.config/bash/aliases.d/grep.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/i3-kiosk/.config/i3/config
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/i3-kiosk/.xinitrc
@@ -48,6 +48,9 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/base/stow
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/dev-tools/debian.pkglist
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/dev-tools/profile.deps
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/dev-tools/stow.pkglist
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/keepassxc/debian.pkglist
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/keepassxc/profile.deps
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/keepassxc/stow.pkglist
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/nerdfonts/build.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/nerdfonts/debian.pkglist
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/profiles/nerdfonts/nerd.fontlist
