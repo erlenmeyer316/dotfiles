@@ -27,7 +27,7 @@ list_file_contents() { file_exists "$1" && cat -n "$1"; }
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 STOW_DIR="${SCRIPT_DIR}/stow"
 mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
-mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setups")
+mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setup")
 
 # Targets — populated during flag parsing
 PROFILES_INPUT=()    # profiles explicitly requested via -p
@@ -43,7 +43,7 @@ DRY_RUN=0
 # ===================================================================
 # Setup helpers
 # ===================================================================
-setup_exists() { dir_exists "${SCRIPT_DIR}/setups/${1}"; }
+setup_exists() { dir_exists "${SCRIPT_DIR}/setup/${1}"; }
 
 run_setup() {
     local setup_script="$1"
