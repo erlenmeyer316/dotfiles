@@ -2,30 +2,19 @@
 
 shopt -s nullglob
 
+
 # ===================================================================
 # Utility functions
 # ===================================================================
 
-command_exists() { command -v "$1" >/dev/null 2>&1; }
-
 package_installed() { dpkg -s "$1" &>/dev/null; }
-
-file_exists() { [[ -f "$1" ]]; }
-
-dir_exists() { [[ -d "$1" ]]; }
-
-print_msg() { [[ "$QUIET" -eq 0 ]] && printf "%s\n" "$1"; }
-
-print_always() { printf "%s\n" "$1"; }
-
-list_file_contents() { file_exists "$1" && cat -n "$1"; }
 
 # ===================================================================
 # Script variables
 # ===================================================================
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-STOW_DIR="${SCRIPT_DIR}/stow"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/core.sh"
+
 mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
 mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setup")
 
