@@ -15,6 +15,12 @@ package_installed() { dpkg -s "$1" &>/dev/null; }
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/core.sh"
 
+source "${LIB_DIR}/profiles.sh"
+source "${LIB_DIR}/stow.sh"
+source "${LIB_DIR}/setup.sh"
+
+
+
 mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
 mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setup")
 
@@ -28,94 +34,6 @@ INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
 FORCE=0
 QUIET=0
 DRY_RUN=0
-
-# ===================================================================
-# Setup helpers
-# ===================================================================
-setup_exists() { dir_exists "${SCRIPT_DIR}/setup/${1}"; }
-
-run_setup() {
-    local setup_script="$1"
-    echo "${setup_script}"
-    file_exists "$setup_script" || return 0
-    if [[ "$DRY_RUN" -eq 1 ]]; then
-        print_always "[dry-run] bash ${setup_script}"
-    else
-        bash "$setup_script"
-    fi
-}
-
-# ===================================================================
-# Profile / stow helpers
-# ===================================================================
-
-profile_exists() { dir_exists "${SCRIPT_DIR}/profiles/${1}"; }
-
-stow_pkg_exists() { dir_exists "${STOW_DIR}/${1}"; }
-
-# Recursively resolve profile deps into INSTALL_PROFILES (deps first)
-register_profile_deps() {
-    local deps_file="${SCRIPT_DIR}/profiles/${1}/profile.deps"
-    file_exists "${deps_file}" || return 0
-    while IFS= read -r dep; do
-        local already=0
-        for p in "${INSTALL_PROFILES[@]}"; do
-            [[ "$p" == "$dep" ]] && already=1 && break
-        done
-        if [[ $already -eq 0 ]]; then
-            INSTALL_PROFILES+=("$dep")
-            register_profile_deps "$dep"
-        fi
-    done < "${deps_file}"
-}
-
-# Expand PROFILES_INPUT into INSTALL_PROFILES with dep resolution
-resolve_profiles() {
-    for profile in "${PROFILES_INPUT[@]}"; do
-        register_profile_deps "$profile"
-        # Append the profile itself after its deps
-        local already=0
-        for p in "${INSTALL_PROFILES[@]}"; do
-            [[ "$p" == "$profile" ]] && already=1 && break
-        done
-        [[ $already -eq 0 ]] && INSTALL_PROFILES+=("$profile")
-    done
-}
-
-# Run stow on a single package directory.
-# $1 = package name, $2 = stow action flag (-R relink | -D unlink)
-run_stow() {
-    local pkg="$1" action="${2:--R}"
-    if [[ "$DRY_RUN" -eq 1 ]]; then
-        print_always "[dry-run] stow ${action} ${pkg}"
-        return
-    fi
-    if [[ "$FORCE" -eq 1 ]]; then
-        stow --adopt -d "${STOW_DIR}" -t ~ "${action}" "$pkg"
-    else
-        stow -d "${STOW_DIR}" -t ~ "${action}" "$pkg"
-    fi
-}
-
-# Stow every package listed in a pkglist file
-link_pkglist() {
-    local pkglist="$1"
-    file_exists "$pkglist" || return 0
-    while IFS= read -r pkg; do
-        print_msg "  Linking ${pkg}"
-        run_stow "$pkg" -R
-    done < "$pkglist"
-}
-
-# Unstow every package listed in a pkglist file
-unlink_pkglist() {
-    local pkglist="$1"
-    file_exists "$pkglist" || return 0
-    while IFS= read -r pkg; do
-        print_msg "  Unlinking ${pkg}"
-        run_stow "$pkg" -D
-    done < "$pkglist"
-}
 
 # ===================================================================
 # Apt helpers
@@ -173,15 +91,15 @@ apt_remove_pkglist() {
     fi
 }
 
-build_from_source() {
-    local build_script="$1"
-    file_exists "$build_script" || return 0
-    if [[ "$DRY_RUN" -eq 1 ]]; then
-        print_always "[dry-run] bash ${build_script}"
-    else
-        bash "$build_script"
-    fi
-}
+#build_from_source() {
+#    local build_script="$1"
+#    file_exists "$build_script" || return 0
+#    if [[ "$DRY_RUN" -eq 1 ]]; then
+#        print_always "[dry-run] bash ${build_script}"
+#    else
+#        bash "$build_script"
+#    fi
+#}
 
 # ===================================================================
 # Internal shared work — called by public subcommand functions
@@ -269,8 +187,8 @@ cmd_install() {
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
         apt_install_pkglist "${SCRIPT_DIR}/profiles/${profile}/debian.pkglist"
-        print_msg "Running source builds for: ${profile}"
-        build_from_source "${SCRIPT_DIR}/profiles/${profile}/build.sh"
+        #print_msg "Running source builds for: ${profile}"
+        #build_from_source "${SCRIPT_DIR}/profiles/${profile}/build.sh"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
