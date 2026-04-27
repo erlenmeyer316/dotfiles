@@ -2,17 +2,6 @@
 
 shopt -s nullglob
 
-
-# ===================================================================
-# Utility functions
-# ===================================================================
-
-package_installed() { dpkg -s "$1" &>/dev/null; }
-
-# ===================================================================
-# Script variables
-# ===================================================================
-
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/core.sh"
 
 source "${LIB_DIR}/profiles.sh"
@@ -33,6 +22,7 @@ DRY_RUN=0
 # ===================================================================
 # Apt helpers
 # ===================================================================
+package_installed() { dpkg -s "$1" &>/dev/null; }
 
 apt_install_pkglist() {
     local pkglist="$1"
@@ -101,11 +91,11 @@ _do_link() {
         fi
     fi
 
-    resolve_profiles
+    resolve_profiles PROFILES_INPUT INSTALL_PROFILES
 
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Linking profile: ${profile}"
-        link_pkglist "${SCRIPT_DIR}/profiles/${profile}/stow.pkglist"
+        link_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
     done
 
     # Restore dotfile versions after --adopt may have pulled in local files
@@ -119,11 +109,11 @@ _do_link() {
 
 # Core unsymlink work used by both 'unlink' and 'remove'
 _do_unlink() {
-    resolve_profiles
+    resolve_profiles PROFILES_INPUT INSTALL_PROFILES
 
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Unlinking profile: ${profile}"
-        unlink_pkglist "${SCRIPT_DIR}/profiles/${profile}/stow.pkglist"
+        unlink_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
     done
 
     for pkg in "${STOW_PKGS[@]}"; do
@@ -157,7 +147,7 @@ cmd_setup(){
    print_msg ""
    for setup in "${SETUPS_INPUT[@]}"; do
        print_msg "Executing setup routines for: ${setup}"
-       run_setup "${SCRIPT_DIR}/setups/${setup}/setup.sh"
+       run_setup "${SETUP_DIR}/${setup}/setup.sh"
    done
 }
 
@@ -171,7 +161,7 @@ cmd_install() {
 
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
-        apt_install_pkglist "${SCRIPT_DIR}/profiles/${profile}/debian.pkglist"
+        apt_install_pkglist "${PROFILE_DIR}/${profile}/debian.pkglist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -183,7 +173,7 @@ cmd_remove() {
     _do_unlink
 
     for profile in "${INSTALL_PROFILES[@]}"; do
-        apt_remove_pkglist "${SCRIPT_DIR}/profiles/${profile}/debian.pkglist"
+        apt_remove_pkglist "${PROFILE_DIR}/${profile}/debian.pkglist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -202,10 +192,10 @@ cmd_list() {
             printf "  %s\n" "${ALL_PROFILES[@]}"
             ;;
         packages)
-            resolve_profiles
+            resolve_profiles PROFILES_INPUT INSTALL_PROFILES
             for profile in "${INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' stow packages:"
-                list_file_contents "${SCRIPT_DIR}/profiles/${profile}/stow.pkglist"
+                list_file_contents "${PROFILE_DIR}/${profile}/stow.pkglist"
             done
             for pkg in "${STOW_PKGS[@]}"; do
                 print_always "Package '${pkg}':"
@@ -217,10 +207,10 @@ cmd_list() {
             done
             ;;
         binaries)
-            resolve_profiles
+            resolve_profiles PROFILES_INPUT INSTALL_PROFILES
             for profile in "${INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' apt packages:"
-                list_file_contents "${SCRIPT_DIR}/profiles/${profile}/debian.pkglist"
+                list_file_contents "${PROFILE_DIR}/${profile}/debian.pkglist"
             done
             ;;
         "")
