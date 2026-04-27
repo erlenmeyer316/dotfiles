@@ -19,11 +19,6 @@ source "${LIB_DIR}/profiles.sh"
 source "${LIB_DIR}/stow.sh"
 source "${LIB_DIR}/setup.sh"
 
-
-
-mapfile -t ALL_PROFILES < <(ls "${SCRIPT_DIR}/profiles")
-mapfile -t ALL_SETUPS < <(ls "${SCRIPT_DIR}/setup")
-
 # Targets — populated during flag parsing
 PROFILES_INPUT=()    # profiles explicitly requested via -p
 SETUPS_INPUT=()      # setups requested via -s
@@ -90,16 +85,6 @@ apt_remove_pkglist() {
         sudo apt-get remove -y "${packages[@]}"
     fi
 }
-
-#build_from_source() {
-#    local build_script="$1"
-#    file_exists "$build_script" || return 0
-#    if [[ "$DRY_RUN" -eq 1 ]]; then
-#        print_always "[dry-run] bash ${build_script}"
-#    else
-#        bash "$build_script"
-#    fi
-#}
 
 # ===================================================================
 # Internal shared work — called by public subcommand functions
@@ -187,8 +172,6 @@ cmd_install() {
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
         apt_install_pkglist "${SCRIPT_DIR}/profiles/${profile}/debian.pkglist"
-        #print_msg "Running source builds for: ${profile}"
-        #build_from_source "${SCRIPT_DIR}/profiles/${profile}/build.sh"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
