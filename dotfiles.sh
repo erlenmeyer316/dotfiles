@@ -95,7 +95,7 @@ _do_link() {
 
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Linking profile: ${profile}"
-        link_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
+        link_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist" "${DRY_RUN}" "${FORCE}"
     done
 
     # Restore dotfile versions after --adopt may have pulled in local files
@@ -103,7 +103,7 @@ _do_link() {
 
     for pkg in "${STOW_PKGS[@]}"; do
         print_msg "Linking package: ${pkg}"
-        run_stow "$pkg" -R
+        run_stow "$pkg" -R "${DRY_RUN}" "${FORCE}"
     done
 }
 
@@ -113,12 +113,12 @@ _do_unlink() {
 
     for profile in "${INSTALL_PROFILES[@]}"; do
         print_msg "Unlinking profile: ${profile}"
-        unlink_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
+        unlink_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist" "${DRY_RUN}" "${FORCE}"
     done
 
     for pkg in "${STOW_PKGS[@]}"; do
         print_msg "Unlinking package: ${pkg}"
-        run_stow "$pkg" -D
+        run_stow "$pkg" -D "${DRY_RUN}" "${FORCE}"
     done
 }
 
