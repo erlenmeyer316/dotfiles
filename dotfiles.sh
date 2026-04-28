@@ -226,6 +226,30 @@ cmd_list() {
     esac
 }
 
+cmd_doctor() {
+    local broken=()
+    find_broken_symlinks broken "$DOCTOR_SEARCH_DEPTH"
+
+    if [[ ${#broken[@]} -eq 0 ]]; then
+        print_always "No broken symlinks found."
+        return 0
+    fi
+
+    print_always "Broken symlinks found:"
+    printf "  %s\n" "${broken[@]}"
+
+    [[ "$1" != "--fix" ]] && return 0
+
+    print_always ""
+    read -r -p "Remove all of the above? [y/N] " confirm
+    [[ ! "$confirm" =~ ^[Yy]$ ]] && return 0
+
+    for link in "${broken[@]}"; do
+        [[ "$DRY_RUN" -eq 1 ]] && print_always "[dry-run] rm ${link}" && continue
+        rm "$link"
+    done
+}
+
 # ===================================================================
 # Usage
 # ===================================================================
@@ -241,6 +265,7 @@ Subcommands:
   setup     Apply a setup configuration
   remove    Remove stow symlinks + remove apt packages
   list      Query profiles, packages + setups
+  doctor    Find and remove broken symlinks
 
 Targets (repeatable, combinable):
   -p  PROFILE   Operate on a profile (resolves dependencies)
@@ -252,6 +277,7 @@ Options:
   -q    Quiet — suppress informational output
   -n    Dry run — print what would happen, do nothing
   -h    Show this help
+  --fix Fix broken symlinnks
 
 List usage:
   $(basename "$0") list profiles
@@ -271,6 +297,7 @@ Examples:
   $(basename "$0") list    packages -p base
   $(basename "$0") list    binaries -p term
   $(basename "$0") install -p term -n
+  $(basename "$0") doctor --fix"
 EOF
 }
 
@@ -394,6 +421,7 @@ case "$SUBCOMMAND" in
     setup)   cmd_setup ;;
     remove)  cmd_remove ;;
     list)    cmd_list "$LIST_SUB" ;;
+    doctor)  cmd_doctor ;;
     -h|--help) usage; exit 0 ;;
     *)
         print_always "Error: unknown subcommand '${SUBCOMMAND}'."
