@@ -42,3 +42,37 @@ readonly PACKAGES_DIR="${DOTFILES_PACKAGES_DIR:-${SCRIPT_DIR}/packages}"
 readonly SETUP_DIR="${DOTFILES_SETUP_DIR:-${SCRIPT_DIR}/setup}"
 readonly PROFILE_DIR="${DOTFILES_PROFILE_DIR:-${SCRIPT_DIR}/profiles}"
 
+# ===================================================================
+# Determine OS
+# ===================================================================
+case "$OSTYPE" in
+  linux*)   OS="Linux" ;;
+  darwin*)  OS="macOS" ;;
+  msys*)    OS="Windows" ;;
+  cygwin*)  OS="Cygwin" ;;
+  solaris*) OS="Solaris" ;;
+  bsd*)     OS="BSD" ;;
+  *)        OS="Unknown ($OSTYPE)" ;;
+esac
+
+# ===================================================================
+# Determine Linux Distro
+# ===================================================================
+if [ "$OS" = "Linux" ]; then
+    if [ -f /etc/os-release ]; then
+        # Load variables from /etc/os-release
+        . /etc/os-release
+        tmpName="${NAME// /-}"
+        DISTRO_INTERNAL="${tmpName////_}"
+        DISTRO=$NAME
+        VERSION=$VERSION_ID
+    elif type lsb_release >/dev/null 2>&1; then
+        # Fallback to lsb_release if /etc/os-release is missing
+        DISTRO=$(lsb_release -si)
+        VERSION=$(lsb_release -sr)
+    else
+        # Basic fallback for older or minimal systems
+        DISTRO=$(uname -s)
+        VERSION=$(uname -r)
+    fi
+fi
