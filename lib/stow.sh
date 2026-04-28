@@ -42,4 +42,11 @@ unlink_pkglist() {
     done < "$pkglist"
 }
 
-
+find_broken_symlinks() {
+    local -n _broken="$1"
+    local search_dir="${2:-$HOME}"
+    local search_depth="$3:-"4"}"
+    while IFS= read -r link; do
+        _broken+=("$link")
+    done < <(find "$search_dir" -maxdepth  -xtype l 2>/dev/null)
+}
