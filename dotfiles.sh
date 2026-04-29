@@ -4,20 +4,23 @@ shopt -s nullglob
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/core.sh"
 
-source "${LIB_DIR}/profiles.sh"
-source "${LIB_DIR}/stow.sh"
-source "${LIB_DIR}/setup.sh"
+source "${_LIB_DIR}/profiles.sh"
+source "${_LIB_DIR}/stow.sh"
+source "${_LIB_DIR}/setup.sh"
 
 # Targets — populated during flag parsing
-PROFILES_INPUT=()    # profiles explicitly requested via -p
-SETUPS_INPUT=()      # setups requested via -s
-STOW_PKGS=()         # individual stow packages requested via -pkg
-INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
+_PROFILES_INPUT=()    # profiles explicitly requested via -p
+_SETUPS_INPUT=()      # setups requested via -s
+_STOW_INPUT=()         # individual stow packages requested via -pkg
+_INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
 
 # Flags
-FORCE=0
-QUIET=0
-DRY_RUN=0
+_FORCE=0
+_QUIET=0
+_DRY_RUN=0
+
+mapfile -t _ALL_SETUPS < <(ls "${_SETUP_DIR}")
+mapfile -t _ALL_PROFILES < <(ls "${_PROFILE_DIR}")
 
 # ===================================================================
 # Apt helpers
@@ -37,7 +40,7 @@ apt_install_pkglist() {
         fi
     done < "$pkglist"
     if [[ ${#packages[@]} -gt 0 ]]; then
-        if [[ "$DRY_RUN" -eq 1 ]]; then
+        if [[ "$_DRY_RUN" -eq 1 ]]; then
             print_always "[dry-run] apt-get install -y ${packages[*]}"
         else
             sudo apt-get install -y "${packages[@]}"
@@ -69,7 +72,7 @@ apt_remove_pkglist() {
         return 0
     fi
 
-    if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$_DRY_RUN" -eq 1 ]]; then
         print_always "[dry-run] apt-get remove -y ${packages[*]}"
     else
         sudo apt-get remove -y "${packages[@]}"
@@ -83,42 +86,42 @@ apt_remove_pkglist() {
 # Core symlink work used by both 'link' and 'install'
 _do_link() {
     # --force requires a clean working tree to avoid silent data loss
-    if [[ "$FORCE" -eq 1 ]]; then
-        if ! git -C "${SCRIPT_DIR}" diff --quiet; then
+    if [[ "$_FORCE" -eq 1 ]]; then
+        if ! git -C "${_SCRIPT_DIR}" diff --quiet; then
             print_always "Error: repo has uncommitted changes. Aborting --force."
-            print_always "Review with: git -C ${SCRIPT_DIR} diff"
+            print_always "Review with: git -C ${_SCRIPT_DIR} diff"
             exit 1
         fi
     fi
 
-    resolve_profiles PROFILES_INPUT INSTALL_PROFILES
+    resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
 
-    for profile in "${INSTALL_PROFILES[@]}"; do
+    for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Linking profile: ${profile}"
-        link_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
+        link_pkglist "${_STOW_DIR}" "${_PROFILE_DIR}/${profile}/stow.pkglist" "${_DRY_RUN}" "${_FORCE}"
     done
 
     # Restore dotfile versions after --adopt may have pulled in local files
-    [[ "$FORCE" -eq 1 ]] && git -C "${SCRIPT_DIR}" reset --hard
+    [[ "$_FORCE" -eq 1 ]] && git -C "${_SCRIPT_DIR}" reset --hard
 
-    for pkg in "${STOW_PKGS[@]}"; do
+    for pkg in "${_STOW_INPUT[@]}"; do
         print_msg "Linking package: ${pkg}"
-        run_stow "$pkg" -R
+        run_stow "${_STOW_DIR}" "$pkg" -R "${_DRY_RUN}" "${_FORCE}"
     done
 }
 
 # Core unsymlink work used by both 'unlink' and 'remove'
 _do_unlink() {
-    resolve_profiles PROFILES_INPUT INSTALL_PROFILES
+    resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
 
-    for profile in "${INSTALL_PROFILES[@]}"; do
+    for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Unlinking profile: ${profile}"
-        unlink_pkglist "${PROFILE_DIR}/${profile}/stow.pkglist"
+        unlink_pkglist "${_STOW_DIR}" "${_PROFILE_DIR}/${profile}/stow.pkglist" "${_DRY_RUN}" "${_FORCE}"
     done
 
-    for pkg in "${STOW_PKGS[@]}"; do
+    for pkg in "${_STOW_INPUT[@]}"; do
         print_msg "Unlinking package: ${pkg}"
-        run_stow "$pkg" -D
+        run_stow "${_STOW_DIR}" "$pkg" -D "${_DRY_RUN}" "${_FORCE}"
     done
 }
 
@@ -145,9 +148,9 @@ cmd_unlink() {
 
 cmd_setup(){
    print_msg ""
-   for setup in "${SETUPS_INPUT[@]}"; do
+   for setup in "${_SETUPS_INPUT[@]}"; do
        print_msg "Executing setup routines for: ${setup}"
-       run_setup "${SETUP_DIR}/${setup}/setup.sh"
+       run_setup "${_SETUP_DIR}/${setup}/setup.sh"
    done
 }
 
@@ -157,11 +160,11 @@ cmd_install() {
 
     print_msg ""
     print_msg "Updating package repositories..."
-    [[ "$DRY_RUN" -eq 0 ]] && sudo apt update
+    [[ "$_DRY_RUN" -eq 0 ]] && sudo apt update
 
-    for profile in "${INSTALL_PROFILES[@]}"; do
+    for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
-        apt_install_pkglist "${PROFILE_DIR}/${profile}/debian.pkglist"
+        apt_install_pkglist "${_PROFILE_DIR}/${profile}/debian.pkglist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -172,8 +175,8 @@ cmd_remove() {
     # Unlink first, then offer apt removal
     _do_unlink
 
-    for profile in "${INSTALL_PROFILES[@]}"; do
-        apt_remove_pkglist "${PROFILE_DIR}/${profile}/debian.pkglist"
+    for profile in "${_INSTALL_PROFILES[@]}"; do
+        apt_remove_pkglist "${_PROFILE_DIR}/${profile}/debian.pkglist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -185,32 +188,32 @@ cmd_list() {
     case "$sub" in
 	setups)
 	    print_always "Available setups:"
-	    printf "  %s\n" "${ALL_SETUPS[@]}"
+	    printf "  %s\n" "${_ALL_SETUPS[@]}"
 	    ;;
         profiles)
             print_always "Available profiles:"
-            printf "  %s\n" "${ALL_PROFILES[@]}"
+            printf "  %s\n" "${_ALL_PROFILES[@]}"
             ;;
         packages)
-            resolve_profiles PROFILES_INPUT INSTALL_PROFILES
-            for profile in "${INSTALL_PROFILES[@]}"; do
+            resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
+            for profile in "${_INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' stow packages:"
-                list_file_contents "${PROFILE_DIR}/${profile}/stow.pkglist"
+                list_file_contents "${_PROFILE_DIR}/${profile}/stow.pkglist"
             done
-            for pkg in "${STOW_PKGS[@]}"; do
+            for pkg in "${_STOW_INPUT[@]}"; do
                 print_always "Package '${pkg}':"
-                if dir_exists "${STOW_DIR}/${pkg}"; then
-                    ls "${STOW_DIR}/${pkg}"
+                if dir_exists "${_STOW_DIR}/${pkg}"; then
+                    ls "${_STOW_DIR}/${pkg}"
                 else
                     print_always "  (not found in repo)"
                 fi
             done
             ;;
         binaries)
-            resolve_profiles PROFILES_INPUT INSTALL_PROFILES
-            for profile in "${INSTALL_PROFILES[@]}"; do
+            resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
+            for profile in "${_INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' apt packages:"
-                list_file_contents "${PROFILE_DIR}/${profile}/debian.pkglist"
+                list_file_contents "${_PROFILE_DIR}/${profile}/debian.pkglist"
             done
             ;;
         "")
@@ -224,6 +227,30 @@ cmd_list() {
             exit 1
             ;;
     esac
+}
+
+cmd_doctor() {
+    local broken=()
+    find_broken_symlinks broken "$DOCTOR_SEARCH_DEPTH"
+
+    if [[ ${#broken[@]} -eq 0 ]]; then
+        print_always "No broken symlinks found."
+        return 0
+    fi
+
+    print_always "Broken symlinks found:"
+    printf "  %s\n" "${broken[@]}"
+
+    [[ "$1" != "--fix" ]] && return 0
+
+    print_always ""
+    read -r -p "Remove all of the above? [y/N] " confirm
+    [[ ! "$confirm" =~ ^[Yy]$ ]] && return 0
+
+    for link in "${broken[@]}"; do
+        [[ "$_DRY_RUN" -eq 1 ]] && print_always "[dry-run] rm ${link}" && continue
+        rm "$link"
+    done
 }
 
 # ===================================================================
@@ -241,6 +268,7 @@ Subcommands:
   setup     Apply a setup configuration
   remove    Remove stow symlinks + remove apt packages
   list      Query profiles, packages + setups
+  doctor    Find and remove broken symlinks
 
 Targets (repeatable, combinable):
   -p  PROFILE   Operate on a profile (resolves dependencies)
@@ -252,6 +280,7 @@ Options:
   -q    Quiet — suppress informational output
   -n    Dry run — print what would happen, do nothing
   -h    Show this help
+  --fix Fix broken symlinnks
 
 List usage:
   $(basename "$0") list profiles
@@ -271,6 +300,7 @@ Examples:
   $(basename "$0") list    packages -p base
   $(basename "$0") list    binaries -p term
   $(basename "$0") install -p term -n
+  $(basename "$0") doctor --fix"
 EOF
 }
 
@@ -293,13 +323,13 @@ if ! dir_exists "$HOME/.local/bin"; then
    mkdir -p "$HOME/.local/bin"
 fi
 
-SUBCOMMAND="$1"
+_SUBCOMMAND="$1"
 shift
 
 # For 'list', consume the sub-action before general flag parsing
-LIST_SUB=""
-if [[ "$SUBCOMMAND" == "list" && "${1:-}" != -* && -n "${1:-}" ]]; then
-    LIST_SUB="$1"
+_LIST_SUB=""
+if [[ "$_SUBCOMMAND" == "list" && "${1:-}" != -* && -n "${1:-}" ]]; then
+    _LIST_SUB="$1"
     shift
 fi
 
@@ -308,22 +338,22 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         -p)
             [[ -z "${2:-}" ]] && { print_always "Error: -p requires an argument."; exit 1; }
-            PROFILES_INPUT+=("$2")
+            _PROFILES_INPUT+=("$2")
             shift 2
             ;;
         -s)
 	    [[ -z "${2:-}" ]] && { print_always "Error: -s requires an argument."; exit 1; }
-            SETUPS_INPUT+=("$2")
+            _SETUPS_INPUT+=("$2")
             shift 2
  	    ;;
         -pkg)
             [[ -z "${2:-}" ]] && { print_always "Error: -pkg requires an argument."; exit 1; }
-            STOW_PKGS+=("$2")
+            _STOW_INPUT+=("$2")
             shift 2
             ;;
-        -f) FORCE=1;   shift ;;
-        -q) QUIET=1;   shift ;;
-        -n) DRY_RUN=1; shift ;;
+        -f) _FORCE=1;   shift ;;
+        -q) _QUIET=1;   shift ;;
+        -n) _DRY_RUN=1; shift ;;
         -h) usage; exit 0 ;;
         *)
             print_always "Error: unknown argument '$1'."
@@ -335,15 +365,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate all profiles exist before doing any work
-for profile in "${PROFILES_INPUT[@]}"; do
-    if ! profile_exists "$profile"; then
+for profile in "${_PROFILES_INPUT[@]}"; do
+    if ! profile_exists "${_PROFILE_DIR}" "$profile"; then
         print_always "Error: profile '${profile}' does not exist."
         exit 1
     fi
 done
 
 # Validate all stow packages exist before doing any work
-for pkg in "${STOW_PKGS[@]}"; do
+for pkg in "${_STOW_INPUT[@]}"; do
     if ! stow_pkg_exists "$pkg"; then
         print_always "Error: stow package '${pkg}' does not exist."
         exit 1
@@ -351,34 +381,34 @@ for pkg in "${STOW_PKGS[@]}"; do
 done
 
 # Validate all setups exist before doing any work
-for setup in "${SETUPS_INPUT[@]}"; do
-    if ! setup_exists "$setup"; then
+for setup in "${_SETUPS_INPUT[@]}"; do
+    if ! setup_exists "${_SETUP_DIR}" "$setup"; then
         print_always "Error: setup '${setup}' does not exist."
 	exit 1
     fi
 done
 
 # Require at least one target for action subcommands
-case "$SUBCOMMAND" in
+case "$_SUBCOMMAND" in
     link|unlink)
-         if [[  ${#STOW_PKGS[@]} -eq 0  ]]; then
-	     print_always "Error: '${SUBCOMMAND}' requires at least one -pkg target."
+         if [[  ${#_STOW_INPUT[@]} -eq 0  ]]; then
+	     print_always "Error: '${_SUBCOMMAND}' requires at least one -pkg target."
              print_always ""
              usage
              exit 1
          fi
          ;;
     install|remove)
-         if [[ ${#PROFILES_INPUT[@]} -eq 0 ]]; then
-             print_always "Error: '${SUBCOMMAND}' requires at least one -p target."
+         if [[ ${#_PROFILES_INPUT[@]} -eq 0 ]]; then
+             print_always "Error: '${_SUBCOMMAND}' requires at least one -p target."
              print_always ""
              usage
              exit 1
          fi
          ;;
     setup)
-         if [[ ${#SETUPS_INPUT[@]} -eq 0 ]]; then
-             print_always "Error: '${SUBCOMMAND}' requires at least one -s target."
+         if [[ ${#_SETUPS_INPUT[@]} -eq 0 ]]; then
+             print_always "Error: '${_SUBCOMMAND}' requires at least one -s target."
              print_always ""
              usage
              exit 1
@@ -387,16 +417,17 @@ case "$SUBCOMMAND" in
 esac
 
 # Dispatch
-case "$SUBCOMMAND" in
+case "$_SUBCOMMAND" in
     link)    cmd_link ;;
     unlink)  cmd_unlink ;;
     install) cmd_install ;;
     setup)   cmd_setup ;;
     remove)  cmd_remove ;;
-    list)    cmd_list "$LIST_SUB" ;;
+    list)    cmd_list "$_LIST_SUB" ;;
+    doctor)  cmd_doctor ;;
     -h|--help) usage; exit 0 ;;
     *)
-        print_always "Error: unknown subcommand '${SUBCOMMAND}'."
+        print_always "Error: unknown subcommand '${_SUBCOMMAND}'."
         print_always ""
         usage
         exit 1
