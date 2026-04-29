@@ -1,12 +1,14 @@
 
 #!/usr/bin/env bash
 
-mapfile -t ALL_SETUPS < <(ls "${SETUP_DIR}")
 
 # ============================================================
 # Setup helpers
 # ============================================================
-setup_exists() { dir_exists "${SETUP_DIR}/${1}"; }
+setup_exists() { 
+    local setup_dir="${1}" setup="$2"
+    dir_exists "${setup_dir}/${setup}";
+}
 
 run_setup() {
     local setup_script="$1"
