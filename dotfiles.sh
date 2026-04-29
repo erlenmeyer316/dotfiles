@@ -195,7 +195,7 @@ cmd_list() {
             printf "  %s\n" "${_ALL_PROFILES[@]}"
             ;;
         packages)
-            resolve_profiles _PROFILES_INPUT _INSTALL_PROFILES
+            resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
             for profile in "${_INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' stow packages:"
                 list_file_contents "${_PROFILE_DIR}/${profile}/stow.pkglist"
