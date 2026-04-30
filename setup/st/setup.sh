@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # skip if already installed
-command -v st > /dev/null 2>&1 && echo "st already installed, skipping" && exit 0
+command -v st > /dev/null 2>&1 && echo "[st] installed" && exit 0
 
 ST_BUILD_DIR="/tmp/dotfiles/build/st"
 ST_GIT_REPO="https://github.com/erlenmeyer316/st"

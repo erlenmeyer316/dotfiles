@@ -33,16 +33,6 @@ if file_exists "${_CONFIG_FILE}"; then
 fi
 
 # ===================================================================
-# Script constants
-# ===================================================================
-
-readonly _LIB_DIR="${_SCRIPT_DIR}/lib"
-readonly _STOW_DIR="${DOTFILES_STOW_DIR:-${_SCRIPT_DIR}/stow}"
-readonly _PACKAGES_DIR="${DOTFILES_PACKAGES_DIR:-${_SCRIPT_DIR}/packages}"
-readonly _SETUP_DIR="${DOTFILES_SETUP_DIR:-${_SCRIPT_DIR}/setup}"
-readonly _PROFILE_DIR="${DOTFILES_PROFILE_DIR:-${_SCRIPT_DIR}/profiles}"
-
-# ===================================================================
 # Determine OS
 # ===================================================================
 case "$OSTYPE" in
@@ -62,23 +52,26 @@ if [ "$OS" = "Linux" ]; then
     if [ -f /etc/os-release ]; then
         # Load variables from /etc/os-release
         . /etc/os-release
-        _tmpName="${NAME// /-}"
-        _DISTRO_INTERNAL="${_tmpName////_}"
-        _DISTRO=$NAME
+        _DISTRO=$ID
         _VERSION=$VERSION_ID
     elif type lsb_release >/dev/null 2>&1; then
         # Fallback to lsb_release if /etc/os-release is missing
-	_name=$(lsb_release -si)
-	_tmpName="${_name// /-}"
-	_DISTRO_INTERNAL="${_tmpName////_}"
 	_DISTRO=$(lsb_release -si)
         _VERSION=$(lsb_release -sr)
     else
         # Basic fallback for older or minimal systems
-        _name=$(uname -s)
-	_tmpName="${_name// /-}"
-	_DISTRO_INTERNAL="${_tmpName////_}"
 	_DISTRO=$(uname -s)
         _VERSION=$(uname -r)
     fi
 fi
+
+# ===================================================================
+# Script constants
+# ===================================================================
+
+readonly _LIB_DIR="${_SCRIPT_DIR}/lib"
+readonly _STOW_DIR="${DOTFILES_STOW_DIR:-${_SCRIPT_DIR}/stow}"
+readonly _SETUP_DIR="${DOTFILES_SETUP_DIR:-${_SCRIPT_DIR}/setup}"
+readonly _PROFILE_DIR="${DOTFILES_PROFILE_DIR:-${_SCRIPT_DIR}/profiles}"
+readonly _INSTALL_DIR="${DOTFILES_DIR:-${SCRIPT_DIR}/install}"
+

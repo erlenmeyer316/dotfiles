@@ -13,7 +13,7 @@ source "${_LIB_DIR}/install.sh"
 # Targets — populated during flag parsing
 _PROFILES_INPUT=()    # profiles explicitly requested via -p
 _SETUPS_INPUT=()      # setups requested via -s
-_STOW_INPUT=()         # individual stow packages requested via -pkg
+_STOW_INPUT=()        # individual stow packages requested via -pkg
 _INSTALL_PROFILES=()  # fully resolved profile list (after dep expansion)
 
 # Flags
@@ -109,7 +109,7 @@ cmd_install() {
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
-        apt_install_pkglist "${_PROFILE_DIR}/${profile}/debian.pkglist"
+        apt_install_pkglist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -121,7 +121,7 @@ cmd_remove() {
     _do_unlink
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-        apt_remove_pkglist "${_PROFILE_DIR}/${profile}/debian.pkglist"
+        apt_remove_pkglist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -319,7 +319,7 @@ done
 
 # Validate all stow packages exist before doing any work
 for pkg in "${_STOW_INPUT[@]}"; do
-    if ! stow_pkg_exists "$pkg"; then
+    if ! stow_pkg_exists "${_STOW_DIR}" "$pkg"; then
         print_always "Error: stow package '${pkg}' does not exist."
         exit 1
     fi

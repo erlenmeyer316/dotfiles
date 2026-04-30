@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 
-# ================================================================
 
 stow_pkg_exists() { 
     local stow_dir="$1" pkg="$2"
     dir_exists "${stow_dir}/${pkg}";
 }
 
-
-# Run stow on a single package directory.
-# $1 = stow directory, $2 = package name, $3 = stow action flag (-R relink | -D unlink), $4 = dry_run flag, $5 = force flag
+# stow a single package
 run_stow() {
     local stow_dir="$1" pkg="$2" action="${3:--R}" dry_run="$4" force="$5"
     if [[ "$dry_run" -eq 1 ]]; then
@@ -51,3 +48,4 @@ find_broken_symlinks() {
         _broken+=("$link")
     done < <(find "$search_dir" -maxdepth "$search_depth" -xtype l 2>/dev/null)
 }
+

@@ -13,7 +13,7 @@ profile_exists() {
 # Recursively resolve profile deps into INSTALL_PROFILES (deps first)
 register_profile_deps() {
     local profile_dir="${1}" profile="${2}"
-    local deps_file="${profile_dir}/${profile}/profile.deps"
+    local deps_file="${profile_dir}/${profile}/profile.deplist"
     local -n rpd_install_profiles=$3
     file_exists "${deps_file}" || return 0
     while IFS= read -r dep; do
