@@ -8,9 +8,15 @@ load_driver() {
 
 }
 
+# gather distinct package managers from binlist
+# combine binlists with the same package manager
+# for each distinct package manager
+# # load package manager driver
+# # if installing - update package manager repos
+# # bulk install/remove packages
 
 # ===================================================================
-# Apt helpers
+# APT DRIVER FUNCTIONS
 # ===================================================================
 package_installed() { dpkg -s "$1" &>/dev/null; }
 
@@ -19,9 +25,11 @@ apt_install_binlist() {
     file_exists "$binlist" || return 0
     local packages=()
     while IFS= read -r bin; do
+	local pm="${bin%:*}"
 	local pkg="${bin##*:}"
         if package_installed "$pkg"; then
-            print_msg "  ${pkg} already installed, skipping"
+#            print_msg " ${pm}:${pkg}"
+	    print_msg "  ${pkg} already installed, skipping"
         else
             print_msg "  Queueing ${pkg}"
             packages+=("$pkg")
@@ -43,6 +51,7 @@ apt_remove_binlist() {
     # Collect only what is actually installed
     local packages=()
     while IFS= read -r bin; do
+	local pm="${bin%:*}"
 	local pkg="${bin##*:}"
         package_installed "$pkg" && packages+=("$pkg")
     done < "$binlist"
@@ -67,4 +76,3 @@ apt_remove_binlist() {
         sudo apt-get remove -y "${packages[@]}"
     fi
 }
-
