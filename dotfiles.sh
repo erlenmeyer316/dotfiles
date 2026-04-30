@@ -109,7 +109,7 @@ cmd_install() {
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
-        apt_install_pkglist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
+        apt_install_binlist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -121,7 +121,7 @@ cmd_remove() {
     _do_unlink
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-        apt_remove_pkglist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
+        apt_remove_binlist "${_PROFILE_DIR}/${profile}/debian-13.binlist"
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
