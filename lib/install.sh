@@ -14,18 +14,19 @@ load_driver() {
 # ===================================================================
 package_installed() { dpkg -s "$1" &>/dev/null; }
 
-apt_install_pkglist() {
-    local pkglist="$1"
-    file_exists "$pkglist" || return 0
+apt_install_binlist() {
+    local binlist="$1"
+    file_exists "$binlist" || return 0
     local packages=()
-    while IFS= read -r pkg; do
+    while IFS= read -r bin; do
+	local pkg="${bin##*:}"
         if package_installed "$pkg"; then
             print_msg "  ${pkg} already installed, skipping"
         else
             print_msg "  Queueing ${pkg}"
             packages+=("$pkg")
         fi
-    done < "$pkglist"
+    done < "$binlist"
     if [[ ${#packages[@]} -gt 0 ]]; then
         if [[ "$_DRY_RUN" -eq 1 ]]; then
             print_always "[dry-run] apt-get install -y ${packages[*]}"
@@ -35,15 +36,16 @@ apt_install_pkglist() {
     fi
 }
 
-apt_remove_pkglist() {
-    local pkglist="$1"
-    file_exists "$pkglist" || return 0
+apt_remove_binlist() {
+    local binlist="$1"
+    file_exists "$binlist" || return 0
 
     # Collect only what is actually installed
     local packages=()
-    while IFS= read -r pkg; do
+    while IFS= read -r bin; do
+	local pkg="${bin##*:}"
         package_installed "$pkg" && packages+=("$pkg")
-    done < "$pkglist"
+    done < "$binlist"
     [[ ${#packages[@]} -eq 0 ]] && return 0
 
     # Always prompt — apt removal is never silent
