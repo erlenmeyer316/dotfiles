@@ -48,7 +48,7 @@ esac
 # ===================================================================
 # Determine Linux Distro
 # ===================================================================
-if [ "$OS" = "Linux" ]; then
+if [ "$_OS" = "Linux" ]; then
     if [ -f /etc/os-release ]; then
         # Load variables from /etc/os-release
         . /etc/os-release

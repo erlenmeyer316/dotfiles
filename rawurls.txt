@@ -1,8 +1,11 @@
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/.gitignore
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/README.md
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/dotfiles.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/install/Debian_Gnu-Linux/13/driver.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/install/Debian_Gnu-Linux/13/pkgmap
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/keybinds.md
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lib/core.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lib/install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lib/profiles.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lib/setup.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/lib/stow.sh
