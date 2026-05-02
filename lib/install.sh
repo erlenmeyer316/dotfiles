@@ -1,46 +1,7 @@
 #!/usr/bin/env bash
-# ==============================================================================
-# lib/install.sh — binary install / remove layer
-#
-# Sourced by dotfiles.sh. Requires core.sh to have been loaded first.
-#
-# Public interface (called from dotfiles.sh):
-#   install_binlist <binlist_path>
-#   remove_binlist  <binlist_path>
-#
-# Internal flow:
-#   _parse_binlist  — groups pm:package lines into _PM_BATCHES by PM
-#   load_driver     — sources lib/drivers/<pm>.sh, defining the five contract fns
-#
-# Driver contract (each driver must implement):
-#   pkg_update_repos          — refresh PM index
-#   pkg_install  <pkg> [...]  — batch install
-#   pkg_remove   <pkg> [...]  — batch remove
-#   pkg_is_installed <pkg>    — returns 0 if installed, 1 if not
-#   pkg_exists   <pkg>        — returns 0 if in repo,    1 if not
-#
-# All five functions honour $_DRY_RUN internally — this file does not need to
-# wrap driver calls in dry-run checks.
-# ==============================================================================
 
-
-# Module-level batch table — populated by _parse_binlist, consumed by
-# install_binlist / remove_binlist. Declared here so it persists across
-# the source boundary; reset before every parse.
 declare -gA _PM_BATCHES
 
-
-# ------------------------------------------------------------------------------
-# _parse_binlist <binlist_path>
-#
-# Reads a {distro}-{version}.binlist file and groups its contents into
-# _PM_BATCHES[pm]="pkg1 pkg2 pkg3". Resets _PM_BATCHES before parsing.
-#
-# Binlist format:
-#   pm:package      — one entry per line
-#   # comment       — ignored
-#   blank lines     — ignored
-# ------------------------------------------------------------------------------
 _parse_binlist() {
     local binlist="$1"
 
@@ -59,21 +20,11 @@ _parse_binlist() {
         [[ -z "$pm" || "${pm:0:1}" == "#" || -z "$pkg" ]] && continue
 
         # Accumulate space-separated packages per PM
-        # Package names never contain spaces, so this is safe
         _PM_BATCHES["$pm"]+="${_PM_BATCHES[$pm]:+ }${pkg}"
     done < "$binlist"
 }
 
 
-# ------------------------------------------------------------------------------
-# load_driver <pm>
-#
-# Sources lib/drivers/<pm>.sh, defining the five contract functions for the
-# current PM. Because function names are fixed (no prefix), all work for a
-# given PM must complete before loading the next driver.
-#
-# Returns 1 if no driver file exists for the requested PM.
-# ------------------------------------------------------------------------------
 load_driver() {
     local pm="$1"
     local driver="${_LIB_DIR}/drivers/${pm}.sh"
@@ -87,19 +38,6 @@ load_driver() {
 }
 
 
-# ------------------------------------------------------------------------------
-# install_binlist <binlist_path>
-#
-# For each distinct PM found in the binlist:
-#   1. Load the PM driver
-#   2. Refresh the package index (pkg_update_repos)
-#   3. Pre-flight: warn and drop packages not found in the repository
-#   4. Filter:    skip packages already installed on this machine
-#   5. Batch install the remaining packages
-#
-# Skips gracefully if the binlist file does not exist (e.g. a profile has no
-# binlist for this distro/version combination).
-# ------------------------------------------------------------------------------
 install_binlist() {
     local binlist="$1"
 
@@ -158,17 +96,6 @@ install_binlist() {
 }
 
 
-# ------------------------------------------------------------------------------
-# remove_binlist <binlist_path>
-#
-# For each distinct PM found in the binlist:
-#   1. Load the PM driver
-#   2. Filter to only packages currently installed on this machine
-#   3. Prompt for confirmation — removal is never silent
-#   4. Batch remove
-#
-# Skips gracefully if the binlist file does not exist.
-# ------------------------------------------------------------------------------
 remove_binlist() {
     local binlist="$1"
 
