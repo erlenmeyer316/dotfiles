@@ -1,9 +1,10 @@
 bash
+btop
+dotfiles
 fastfetch
 fzf
+git
 grep
 less
 neovim
 ranger
-dotfiles
-btop

@@ -1,9 +1,0 @@
-apt:git
-apt:gh
-apt:lazygit
-apt:build-essential
-apt:python3
-apt:python3-venv
-apt:python3-dev
-apt:python3-pip
-apt:libharfbuzz-dev
