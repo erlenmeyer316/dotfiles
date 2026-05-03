@@ -1,9 +1,0 @@
-apt:starship
-apt:w3m
-apt:w3m-img
-apt:lynx
-apt:tmux
-apt:python3-pip
-apt:python3-bs4
-apt:nala
-apt:zoxide
