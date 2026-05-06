@@ -1,0 +1,26 @@
+[general]
+# Folder where vdirsyncer can store some metadata about each pair.
+status_path = "~/.cache/vdirsyncer/status/"
+
+# CardDAV
+[pair posteo_contacts]
+a = "posteo_contacts_local"
+b = "posteo_contacts_remote"
+collections = ["from a", "from b"]
+
+# metadata = ["displayname"]
+
+[storage posteo_contacts_local]
+# Storage references actual data on a remote server or on the local disk.
+type = "filesystem"
+path = "~/.local/contacts/adam.dickison@posteo.net"
+fileext = ".vcf"
+
+[storage posteo_contacts_remote]
+type = "carddav"
+url = "https://posteo.de:8443"
+username = "adam.dickison@posteo.net"
+# password = "secretpassword"
+# password.fetch = ["command", "~/get-password.sh", "more", "args"]
+password.fetch = ["prompt", "Password for CalDAV"]
+read_only = true
