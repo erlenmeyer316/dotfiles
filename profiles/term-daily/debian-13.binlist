@@ -3,12 +3,15 @@ apt:keepassxc
 apt:libsecret-tools
 apt:lynx
 apt:nala
+apt:neomutt
 apt:python3-bs4
 apt:python3-pip
 apt:starship
 apt:tmux
+apt:vdirsyncer
 apt:w3m
 apt:w3m-img
 apt:xclip
 apt:xsel
 apt:zoxide
+apt:khard
