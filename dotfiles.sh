@@ -93,8 +93,17 @@ cmd_unlink() {
 }
 
 cmd_install() {
-    # install implies link — symlinks are always set up first
+    # call all prelink setups
+
+    for profile in "${_INSTALL_PROFILES[@]}"; do
+	# call prelink setup with profile setup list
+    done
+
     _do_link
+
+    for profile in "${_INSTALL_PROFILES[@]}"; do
+	# call preinstall setup with profile setup list
+    done
 
     print_msg ""
     print_msg "Updating package repositories..."
@@ -106,7 +115,9 @@ cmd_install() {
 
     done
 
-    # Individual -pkg targets have no pkglist — no apt action taken
+    for profile in "${_INSTALL_PROFILES[@]}"; do
+	# call postinstall setup with profile setup list
+    done
     finish_msg
 }
 
