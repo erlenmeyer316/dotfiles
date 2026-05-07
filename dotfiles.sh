@@ -70,6 +70,7 @@ _do_unlink() {
     done
 }
 
+
 finish_msg() {
     if file_exists "$HOME/.profile"; then
         print_msg ""
@@ -91,14 +92,6 @@ cmd_unlink() {
     _do_unlink
 }
 
-cmd_setup(){
-   print_msg ""
-   for setup in "${_SETUPS_INPUT[@]}"; do
-       print_msg "Executing setup routines for: ${setup}"
-       run_setup "${_SETUP_DIR}/${setup}/setup.sh"
-   done
-}
-
 cmd_install() {
     # install implies link — symlinks are always set up first
     _do_link
@@ -110,6 +103,7 @@ cmd_install() {
     for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
         install_binlist "${_PROFILE_DIR}/${profile}/${_DISTRO}-${_VERSION}.binlist"
+
     done
 
     # Individual -pkg targets have no pkglist — no apt action taken
@@ -124,17 +118,12 @@ cmd_remove() {
         remove_binlist "${_PROFILE_DIR}/${profile}/${_DISTRO}-${_VERSION}.binlist"
     done
 
-    # Individual -pkg targets have no pkglist — no apt action taken
 }
 
 cmd_list() {
     local sub="$1"
 
     case "$sub" in
-	setups)
-	    print_always "Available setups:"
-	    printf "  %s\n" "${_ALL_SETUPS[@]}"
-	    ;;
         profiles)
             print_always "Available profiles:"
             printf "  %s\n" "${_ALL_PROFILES[@]}"
@@ -210,7 +199,6 @@ Subcommands:
   link      Symlink dotfiles via stow 
   unlink    Remove stow symlinks 
   install   Symlink dotfiles + install apt packages
-  setup     Apply a setup configuration
   remove    Remove stow symlinks + remove apt packages
   list      Query profiles, packages + setups
   doctor    Find and remove broken symlinks
@@ -218,18 +206,16 @@ Subcommands:
 Targets (repeatable, combinable):
   -p  PROFILE   Operate on a profile (resolves dependencies)
   -pkg PKG      Operate on a single stow package
-  -s SETUP      Operate on a single setup
 
 Options:
   -f    Force overwrite existing dotfiles (stow --adopt + git reset)
   -q    Quiet — suppress informational output
-  -n    Dry run — print what would happen, do nothing
+  -d    Dry run — print what would happen, do nothing
   -h    Show this help
   --fix Fix broken symlinnks
 
 List usage:
   $(basename "$0") list profiles
-  $(basename "$0") list setups
   $(basename "$0") list packages  -p PROFILE [-p PROFILE ...]
   $(basename "$0") list packages  -pkg PKG   [-pkg PKG ...]
   $(basename "$0") list binaries  -p PROFILE [-p PROFILE ...]
@@ -240,11 +226,10 @@ Examples:
   $(basename "$0") link    -pkg ranger -pkg tmux
   $(basename "$0") unlink  -p term-x11
   $(basename "$0") remove  -p dev-tools
-  $(basename "$0") setup   -s syncthing
   $(basename "$0") list    profiles
   $(basename "$0") list    packages -p base
   $(basename "$0") list    binaries -p term
-  $(basename "$0") install -p term -n
+  $(basename "$0") install -p term -d
   $(basename "$0") doctor --fix"
 EOF
 }
@@ -286,11 +271,6 @@ while [[ $# -gt 0 ]]; do
             _PROFILES_INPUT+=("$2")
             shift 2
             ;;
-        -s)
-	    [[ -z "${2:-}" ]] && { print_always "Error: -s requires an argument."; exit 1; }
-            _SETUPS_INPUT+=("$2")
-            shift 2
- 	    ;;
         -pkg)
             [[ -z "${2:-}" ]] && { print_always "Error: -pkg requires an argument."; exit 1; }
             _STOW_INPUT+=("$2")
@@ -298,7 +278,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -f) _FORCE=1;   shift ;;
         -q) _QUIET=1;   shift ;;
-        -n) _DRY_RUN=1; shift ;;
+        -d) _DRY_RUN=1; shift ;;
         -h) usage; exit 0 ;;
         *)
             print_always "Error: unknown argument '$1'."
@@ -325,13 +305,6 @@ for pkg in "${_STOW_INPUT[@]}"; do
     fi
 done
 
-# Validate all setups exist before doing any work
-for setup in "${_SETUPS_INPUT[@]}"; do
-    if ! setup_exists "${_SETUP_DIR}" "$setup"; then
-        print_always "Error: setup '${setup}' does not exist."
-	exit 1
-    fi
-done
 
 # Require at least one target for action subcommands
 case "$_SUBCOMMAND" in
@@ -351,14 +324,6 @@ case "$_SUBCOMMAND" in
              exit 1
          fi
          ;;
-    setup)
-         if [[ ${#_SETUPS_INPUT[@]} -eq 0 ]]; then
-             print_always "Error: '${_SUBCOMMAND}' requires at least one -s target."
-             print_always ""
-             usage
-             exit 1
-         fi
-         ;;
 esac
 
 # Dispatch
@@ -366,7 +331,6 @@ case "$_SUBCOMMAND" in
     link)    cmd_link ;;
     unlink)  cmd_unlink ;;
     install) cmd_install ;;
-    setup)   cmd_setup ;;
     remove)  cmd_remove ;;
     list)    cmd_list "$_LIST_SUB" ;;
     doctor)  cmd_doctor ;;
