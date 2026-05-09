@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # skip if already installed
-command -v st > /dev/null 2>&1 && echo "[st] installed" && exit 0
+command -v st > /dev/null 2>&1 && echo "[st] is already installed. Skipping." && exit 0
 
 if ! command -v git &> /dev/null; then
     print_msg "[st] requires curl"

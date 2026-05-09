@@ -1,5 +1,4 @@
 apt:i3
-apt:browsh
 apt:xinit
 apt:xdg-user-dirs
 apt:libx11-dev

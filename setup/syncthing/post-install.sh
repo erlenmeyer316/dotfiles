@@ -8,7 +8,7 @@ SYNC_DIR="$HOME/Sync"
 CONFIG_XML="${XDG_STATE_HOME:-$HOME/.local/state}/syncthing/config.xml"
 
 if command -v syncthing &> /dev/null; then
-    echo "[syncthing] installed."
+    echo "[syncthing] is already installed. Skipping."
 else
     echo "[syncthing] installing from official apt repo..."
     if [[ ! -f /etc/apt/sources.list.d/syncthing.list ]]; then
