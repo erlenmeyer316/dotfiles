@@ -93,16 +93,19 @@ cmd_unlink() {
 }
 
 cmd_install() {
-    # call all prelink setups
+	
+    resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-	# call prelink setup with profile setup list
+        echo "prelink!"
+	execute_pre_link_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
 
     _do_link
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-	# call preinstall setup with profile setup list
+        echo "preinstall!"
+	execute_pre_install_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
 
     print_msg ""
@@ -116,7 +119,8 @@ cmd_install() {
     done
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-	# call postinstall setup with profile setup list
+        echo "postinstall!"
+	execute_post_install_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
     finish_msg
 }
@@ -258,10 +262,6 @@ if [[ "$#" -eq 0 ]]; then
     print_always "Error: no subcommand given."
     usage
     exit 1
-fi
-
-if ! dir_exists "$HOME/.local/bin"; then
-   mkdir -p "$HOME/.local/bin"
 fi
 
 _SUBCOMMAND="$1"
