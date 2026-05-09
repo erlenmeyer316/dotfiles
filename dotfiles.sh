@@ -97,14 +97,12 @@ cmd_install() {
     resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-        echo "prelink!"
 	execute_pre_link_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
 
     _do_link
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-        echo "preinstall!"
 	execute_pre_install_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
 
@@ -119,7 +117,6 @@ cmd_install() {
     done
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
-        echo "postinstall!"
 	execute_post_install_setups "${_SETUP_DIR}" "${_PROFILE_DIR}/${profile}/setups.pkglist"
     done
     finish_msg
