@@ -42,7 +42,6 @@ install_binlist() {
     local binlist="$1"
 
     if ! file_exists "$binlist"; then
-        print_msg "No binlist at ${binlist} — skipping."
         return 0
     fi
 
