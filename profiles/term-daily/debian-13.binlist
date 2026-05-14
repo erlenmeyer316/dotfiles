@@ -15,3 +15,4 @@ apt:xclip
 apt:xsel
 apt:zoxide
 apt:khard
+apt:msmtp
