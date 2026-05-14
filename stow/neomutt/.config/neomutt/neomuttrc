@@ -1,0 +1,28 @@
+## Account settings
+set from = adam.dickison@posteo.net
+set realname = "Adam M. Dickison"
+
+set mbox_type = Maildir
+set folder = "~/.local/mail/posteo"
+
+set sendmail = "msmtp -a adam.dickison@posteo.net"
+
+# cache settings
+set header_cache = "~/.cache/mutt/posteo/header_cache"
+set message_cachedir = "~/.cache/mutt/posteo/message_cache"
+
+# mailbox settings
+set spoolfile = +INBOX
+set postponed = +Drafts
+set record = +Sent
+set trash = +Trash
+
+# navigation settings
+bind index,pager g noop
+macro index,pager gi "<change-folder>=INBOX<enter>" "go to inbox"
+macro index,pager gs "<change-folder>=Sent<enter>" "go to sent"
+macro index,pager gd "<change-folder>=Drafts<enter>" "go to drafts"
+macro index,pager gt "<change-folder>=Trash<enter>" "go to trash"
+
+# syncronization settings ['s' to sync]
+macro index S "<shell-escape>mbsync -V <adam.dickison@posteo.net><enter>" "sync email"
