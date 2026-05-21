@@ -1,28 +1,58 @@
-## Account settings
-set from = adam.dickison@posteo.net
-set realname = "Adam M. Dickison"
+## Neomutt configuration file located at ~/.config/neomutt/neomuttrc
+set from='adam.dickison@posteo.net'
+set realname='First Last'
+set sendmail = "/usr/bin/msmtp -a posteo"
+set sendmail_wait = 0
+unset record
 
-set mbox_type = Maildir
-set folder = "~/.local/mail/posteo"
+set header_cache='~/.cache/neomutt/headers'
+set message_cachedir='~/.cache/neomutt/bodies'
+set certificate_file='~/.cache/neomutt/certificates'
 
-set sendmail = "msmtp -a adam.dickison@posteo.net"
+# My mailboxes
+set folder ='~/.local/mail/posteo'
+set spoolfile='+INBOX'
+set postponed='+Drafts'
+set record='+Sent'
+set trash='+Trash'
+mailboxes 
 
-# cache settings
-set header_cache = "~/.cache/mutt/posteo/header_cache"
-set message_cachedir = "~/.cache/mutt/posteo/message_cache"
+# Personal preferences
+set date_format="%y/%m/%d %I:%M%p"
+set editor='nvim'
+set sort=threads
+set sort='reverse-date'
+set forward_format = "Fwd: %s"
+set include
 
-# mailbox settings
-set spoolfile = +INBOX
-set postponed = +Drafts
-set record = +Sent
-set trash = +Trash
+# Setup khard for address book
+set query_command= "khard email --parsable %s"
+bind editor <Tab> complete-query
+bind editor ^T complete
 
-# navigation settings
-bind index,pager g noop
-macro index,pager gi "<change-folder>=INBOX<enter>" "go to inbox"
-macro index,pager gs "<change-folder>=Sent<enter>" "go to sent"
-macro index,pager gd "<change-folder>=Drafts<enter>" "go to drafts"
-macro index,pager gt "<change-folder>=Trash<enter>" "go to trash"
+# Set key bindings
+bind compose p postpone-message
+bind index p recall-message
+macro index G "!mbsync -a -c ~/.config/isync//.mbsyncrc^M" "Update through mbsync"
 
-# syncronization settings ['s' to sync]
-macro index S "<shell-escape>mbsync -V <adam.dickison@posteo.net><enter>" "sync email"
+# Sidebar settings
+set sidebar_visible=yes
+set sidebar_width=20
+set sidebar_short_path = yes
+set sidebar_next_new_wrap = yes
+set mail_check_stats
+#set sidebar_format = '%B%?F? [%F]?%* %?N?%N/?%S'
+bind index,pager \Ck sidebar-prev
+bind index,pager \Cj sidebar-next
+bind index,pager \Co sidebar-open
+bind index,pager \Cp sidebar-prev-new
+bind index,pager \Cn sidebar-next-new
+bind index,pager B sidebar-toggle-visible
+
+# HTML settings
+set mailcap_path = ~/.config/neomutt/mailcap
+alternative_order text/plain text/enriched text/html
+macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF-8 > ~/.cache/neomutt/neomail.html<enter><shell-escape>$BROWSER ~/.cache/neomutt/neomail.html<enter>"
+
+source colors.neomuttrc
+

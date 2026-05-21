@@ -2,14 +2,17 @@
 
 set -euo pipefail
 
-if [ ! -d "$HOME/.cache/vdirsyncer/status" ]; then
-   mkdir -p "$HOME/.cache/vdirsyncer/status"
+
+if [ ! -d "$HOME/.cache/neomutt/headers" ]; then
+   mkdir -p "$HOME/.cache/neomutt/headers"
 fi
 
-if [ ! -d "$HOME/.local/contacts/" ]; then
-   mkdir -p "$HOME/.local/contacts/"
+if [ ! -d "$HOME/.cache/neomutt/bodies" ]; then
+   mkdir -p "$HOME/.cache/neomutt/bodies"
 fi
 
-if [ ! -d "$HOME/.local/mail/" ]; then
-   mkdir -p "$HOME/.local/mail/"
+if [ ! -d "$HOME/.cache/neomutt/certificates" ]; then
+   mkdir -p "$HOME/.cache/neomutt/certificates"
 fi
+
+

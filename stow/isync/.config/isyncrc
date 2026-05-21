@@ -1,5 +1,8 @@
-# https://blog.stallmer.com/posts/posteo-imap-in-mutt/
-IMAPStore posteo-remote
+Create Both
+Expunge Both
+SyncState *
+
+IMAPAccount posteo
 Host posteo.de
 Port 993
 User adam.dickison@posteo.net
@@ -7,15 +10,36 @@ User adam.dickison@posteo.net
 TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 
+IMAPStore posteo-remote
+Account posteo
+
 MaildirStore posteo-local
-Path ~/.local/mail/posteo
-Inbox ~/.local/mail/posteo/INBOX
+Path ~/.local/mail/adam.dickison@posteo.net/
+Inbox ~/.local/mail/adam.dickison@posteo.net/INBOX
 Subfolders Verbatim
 
 Channel posteo
 Far :posteo-remote:
 Near :posteo-local:
-Create Both
-Expunge Both
-SyncState *
 Patterns *
+
+IMAPAccount gmail
+Host imap.gmail.com
+User adam.dickison@gmail.com
+#PassCmd ""
+TLSType IMAPS
+AuthMechs LOGIN
+
+IMAPStore gmail-remote
+Account gmail
+
+MaildirStore gmail-local
+Path ~/.local/mail/adam.dickison@gmail.com/
+Inbox ~/.local/mail/adam.dickison@gmail.com/INBOX
+Subfolders Verbatim
+
+Channel gmail
+Far :gmail-remote:
+Near :gmail-local:
+Patterns * !"[Gmail]/All Mail" !"[Gmail]/Important" !"[Gmail]/Starred" !"[Gmail]/Bin"
+
