@@ -6,7 +6,7 @@ IMAPAccount posteo
 Host posteo.de
 Port 993
 User adam.dickison@posteo.net
-#PassCmd ""
+PassCmd "kp get mail/posteo.de"
 TLSType IMAPS
 CertificateFile /etc/ssl/certs/ca-certificates.crt
 
@@ -26,7 +26,7 @@ Patterns *
 IMAPAccount gmail
 Host imap.gmail.com
 User adam.dickison@gmail.com
-#PassCmd ""
+PassCmd "kp get mail/google-mbsync"
 TLSType IMAPS
 AuthMechs LOGIN
 
