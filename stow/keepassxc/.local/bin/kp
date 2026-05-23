@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # kp — keepassxc-cli wrapper
-# Deps: keepassxc-cli, libsecret-tools (secret-tool), fzf, xclip/xsel
+# Deps: keepassxc-cli, libsecret-tools, fzf, xclip/xsel
 
 set -euo pipefail
 
-# Source shared library
-_KP_CORE="${XDG_CONFIG_HOME:-$HOME/.config}/kp/kp-core.sh"
+# ── Source shared library ─────────────────────────────────────────────────────
+_KP_CORE="${XDG_CONFIG_HOME:-${HOME}/.config}/kp/kp-core.sh"
 if [[ ! -f "$_KP_CORE" ]]; then
-    echo "kp: core library not found at $_KP_CORE" >&2
+    echo "kp: core library not found at ${_KP_CORE}" >&2
     exit 1
 fi
 source "$_KP_CORE"
@@ -35,7 +35,7 @@ cmd_url() {
 }
 
 cmd_show() {
-    # All fields, password redacted — safe for terminal display
+    # All visible fields, password redacted — safe for terminal display
     local entry="${1:-$(_kp_pick)}"
     _kp_cli show "$KP_DB" "$entry"
 }
@@ -56,11 +56,11 @@ cmd_clip_totp() {
 }
 
 cmd_unlock() {
-    _kp_get_master > /dev/null && echo "kp: unlocked."
+    _kp_get_master >/dev/null && echo "kp: unlocked."
 }
 
 cmd_lock() {
-    if command -v secret-tool &>/dev/null; then
+    if command -v secret-tool >/dev/null 2>&1; then
         secret-tool clear "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null
         echo "kp: keyring cache cleared."
     else
@@ -85,11 +85,11 @@ Usage: kp <command> [entry]
   clip-user  [entry]   copy username to clipboard
   clip-totp  [entry]   copy TOTP to clipboard
   unlock               pre-warm keyring cache
-  lock                 clear keyring cache
+  lock                 evict keyring cache
 
 Omitting [entry] opens an fzf picker.
 
-Config: \${XDG_CONFIG_HOME:-~/.config}/kp/config
+Config:    \${XDG_CONFIG_HOME:-~/.config}/kp/config
 Overrides: KP_DB, KP_PASS, KP_CLIP_TIMEOUT
 EOF
 }
