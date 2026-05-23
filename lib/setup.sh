@@ -50,7 +50,7 @@ execute_post_install_setups() {
 execute_setup() {
     local setup_script="${1}"
     file_exists "$setup_script" || return 0
-    if [[ "$DRY_RUN" -eq 1 ]]; then
+    if [[ "$_DRY_RUN" -eq 1 ]]; then
         print_always "[dry-run] bash ${setup_script}"
     else
         bash "$setup_script"

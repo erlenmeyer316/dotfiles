@@ -108,7 +108,6 @@ cmd_install() {
 
     print_msg ""
     print_msg "Updating package repositories..."
-    [[ "$_DRY_RUN" -eq 0 ]] && sudo apt update
 
     for profile in "${_INSTALL_PROFILES[@]}"; do
         print_msg "Installing apt packages for: ${profile}"
@@ -159,7 +158,7 @@ cmd_list() {
             resolve_profiles "${_PROFILE_DIR}" _PROFILES_INPUT _INSTALL_PROFILES
             for profile in "${_INSTALL_PROFILES[@]}"; do
                 print_always "Profile '${profile}' apt packages:"
-                list_file_contents "${_PROFILE_DIR}/${profile}/debian.pkglist"
+                list_file_contents "${_PROFILE_DIR}/${profile}/${_DISTRO}-${_VERSION}.binlist"
             done
             ;;
         "")

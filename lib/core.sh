@@ -18,7 +18,7 @@ file_exists() { [[ -f "$1" ]]; }
 
 dir_exists() { [[ -d "$1" ]]; }
  
-print_msg() { [[ "$QUIET" -eq 0 ]] && printf "%s\n" "$1"; }
+print_msg() { [[ "$_QUIET" -eq 0 ]] && printf "%s\n" "$1"; }
 
 print_always() { printf "%s\n" "$1"; }
 
