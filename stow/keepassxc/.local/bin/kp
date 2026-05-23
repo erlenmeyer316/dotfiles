@@ -68,6 +68,22 @@ cmd_lock() {
     fi
 }
 
+cmd_debug() {
+    export KP_DEBUG=1
+    _kp_debug_info
+    # Re-run the requested subcommand with debug on, or just show db info
+    local subcmd="${1:-show}"
+    local entry="${2:-}"
+    case "$subcmd" in
+        get)       [[ -n "$entry" ]] && cmd_get  "$entry" ;;
+        user)      [[ -n "$entry" ]] && cmd_user "$entry" ;;
+        totp)      [[ -n "$entry" ]] && cmd_totp "$entry" ;;
+        show)      [[ -n "$entry" ]] && cmd_show "$entry" ;;
+        ls)        _kp_cli ls -R -f "$KP_DB" ;;
+        *)         echo "kp debug: try 'kp debug ls' to test db open" >&2 ;;
+    esac
+}
+
 # ── Usage ─────────────────────────────────────────────────────────────────────
 
 usage() {
@@ -86,6 +102,8 @@ Usage: kp <command> [entry]
   clip-totp  [entry]   copy TOTP to clipboard
   unlock               pre-warm keyring cache
   lock                 evict keyring cache
+  debug      [subcmd]  debug info and optionally run a subcommand with debug on
+  
 
 Omitting [entry] opens an fzf picker.
 
@@ -107,5 +125,6 @@ case "${1:-}" in
     clip-totp)  cmd_clip_totp "${2:-}" ;;
     unlock)     cmd_unlock ;;
     lock)       cmd_lock ;;
+    debug)      cmd_debug     "${2:-}" "${3:-}" ;;
     *)          usage ;;
 esac

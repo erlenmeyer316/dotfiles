@@ -21,6 +21,24 @@ KP_CLIP_TIMEOUT="${KP_CLIP_TIMEOUT:-10}"
 KP_KEYRING_SERVICE="${KP_KEYRING_SERVICE:-kp}"
 KP_KEYRING_ACCOUNT="${KP_KEYRING_ACCOUNT:-master}"
 
+# ── Debug mode ────────────────────────────────────────────────────────────────
+# Enable with KP_DEBUG=1 or by running: kp debug <command> [entry]
+# Strips -q and 2>/dev/null so keepassxc-cli speaks freely.
+# Also prints the resolved config and exact command being run.
+
+_kp_debug_info() {
+    echo "── kp debug ─────────────────────────────────" >&2
+    echo "  KP_DB              = ${KP_DB}" >&2
+    echo "  DB exists          = $(  [[ -f "$KP_DB" ]] && echo yes || echo NO — FILE NOT FOUND)" >&2
+    echo "  DB readable        = $([[ -r "$KP_DB" ]] && echo yes || echo NO — PERMISSION DENIED)" >&2
+    echo "  keepassxc-cli      = $(command -v keepassxc-cli 2>/dev/null || echo NOT FOUND)" >&2
+    echo "  keepassxc-cli ver  = $(keepassxc-cli --version 2>&1 || echo unknown)" >&2
+    echo "  secret-tool        = $(command -v secret-tool 2>/dev/null || echo not found)" >&2
+    echo "  KP_PASS set        = $([[ -n "${KP_PASS:-}" ]] && echo yes || echo no)" >&2
+    echo "  Keyring cached     = $(secret-tool lookup "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null && echo yes || echo no)" >&2
+    echo "─────────────────────────────────────────────" >&2
+}
+
 # ── Dependency check ──────────────────────────────────────────────────────────
 _kp_require() {
     for cmd in "$@"; do
@@ -96,7 +114,17 @@ _kp_cli() {
     _kp_require keepassxc-cli || return 1
     local pw
     pw=$(_kp_get_master) || return 1
-    echo "$pw" | keepassxc-cli -q "$@" 2>/dev/null
+
+    if [[ -n "${KP_DEBUG:-}" ]]; then
+        echo "  _kp_cli args       = $*" >&2
+        echo "  password length    = ${#pw}" >&2
+        echo "  running: keepassxc-cli $*" >&2
+        echo "─────────────────────────────────────────────" >&2
+        # Run without -q and without stderr suppression so we see everything
+        echo "$pw" | keepassxc-cli "$@"
+    else
+        echo "$pw" | keepassxc-cli "$@" 2>/dev/null
+    fi
 }
 
 # ── Clipboard helper ──────────────────────────────────────────────────────────
