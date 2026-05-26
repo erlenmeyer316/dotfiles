@@ -1,0 +1,79 @@
+# Moonfly theme for btop++
+# Place at: ~/.config/btop/themes/moonfly.theme
+# Activate: set color_theme = "moonfly" in btop.conf
+#           (btop searches ~/.config/btop/themes/ automatically)
+#
+# Moonfly palette reference:
+#   bg=#080808  surface=#323437  muted=#949494  fg=#bdbdbd
+#   blue=#80a0ff  cyan=#79dac8  green=#8cc85f  yellow=#e3c78a
+#   red=#ff5454   magenta=#cf87e8
+#   br_blue=#74b2ff  br_cyan=#85dc85  br_green=#36c692
+#   br_red=#ff5189   br_magenta=#ae81ff  br_yellow=#c6c684
+#   selection=#b2ceee
+
+# ── Main UI chrome ────────────────────────────────────────────────────────
+
+theme[main_bg]="#080808"       # Primary background — near-black
+theme[main_fg]="#bdbdbd"       # Primary foreground — soft grey
+theme[title]="#80a0ff"         # Box titles — moonfly primary blue
+theme[hi_fg]="#74b2ff"         # Highlight foreground — bright blue
+theme[selected_bg]="#323437"   # Selected item background — dark surface
+theme[selected_fg]="#b2ceee"   # Selected item foreground — cool selection blue
+theme[inactive_fg]="#949494"   # Inactive / muted text
+theme[graph_text]="#bdbdbd"    # Text inside graphs
+theme[meter_bg]="#323437"      # Meter/gauge background
+theme[proc_misc]="#79dac8"     # Miscellaneous process info — cyan
+
+# ── Box borders ───────────────────────────────────────────────────────────
+
+theme[cpu_box]="#80a0ff"       # CPU box border — blue
+theme[mem_box]="#8cc85f"       # Memory box border — green
+theme[net_box]="#79dac8"       # Network box border — cyan
+theme[proc_box]="#cf87e8"      # Process box border — magenta
+theme[div_line]="#323437"      # Dividers between boxes — dark surface
+
+# ── Temperature gradient (cool → warm → hot) ──────────────────────────────
+
+theme[temp_start]="#74b2ff"    # Low temp — bright blue (cool)
+theme[temp_mid]="#e3c78a"      # Mid temp — yellow (warm)
+theme[temp_end]="#ff5454"      # High temp — red (hot)
+
+# ── CPU usage gradient ────────────────────────────────────────────────────
+
+theme[cpu_start]="#80a0ff"     # Low CPU — blue
+theme[cpu_mid]="#79dac8"       # Mid CPU — cyan
+theme[cpu_end]="#8cc85f"       # High CPU — green (moonfly is optimistic)
+
+# ── Memory gradients ──────────────────────────────────────────────────────
+
+theme[free_start]="#36c692"    # Lots of free RAM — bright green
+theme[free_mid]="#8cc85f"      # Some free RAM — green
+theme[free_end]="#e3c78a"      # Low free RAM — yellow
+
+theme[cached_start]="#74b2ff"  # Cached — bright blue
+theme[cached_mid]="#80a0ff"    # Cached mid — blue
+theme[cached_end]="#cf87e8"    # Cached high — magenta
+
+theme[available_start]="#85dc85" # Available — bright cyan-green
+theme[available_mid]="#36c692"
+theme[available_end]="#8cc85f"
+
+theme[used_start]="#e3c78a"    # Used — yellow (caution)
+theme[used_mid]="#ff5189"      # Used high — bright red
+theme[used_end]="#ff5454"      # Used critical — red
+
+# ── Network gradients ─────────────────────────────────────────────────────
+
+theme[download_start]="#74b2ff"  # Download low — bright blue
+theme[download_mid]="#80a0ff"    # Download mid — blue
+theme[download_end]="#cf87e8"    # Download high — magenta
+
+theme[upload_start]="#85dc85"    # Upload low — bright cyan-green
+theme[upload_mid]="#79dac8"      # Upload mid — cyan
+theme[upload_end]="#36c692"      # Upload high — bright green
+
+# ── Process list gradient ─────────────────────────────────────────────────
+
+theme[process_start]="#80a0ff"   # Low CPU process — blue
+theme[process_mid]="#cf87e8"     # Mid CPU process — magenta
+theme[process_end]="#ff5189"     # High CPU process — bright red
