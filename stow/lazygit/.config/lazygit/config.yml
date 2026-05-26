@@ -1,0 +1,123 @@
+# Moonfly theme for lazygit
+# Full config.yml — your existing file was empty, so this includes
+# a sensible baseline config alongside the theme block.
+#
+# Place at: ~/.config/lazygit/config.yml
+# (stow path: stow/lazygit/.config/lazygit/config.yml)
+
+gui:
+  # Theme — all colors are hex strings; attribute strings go alongside
+  theme:
+    # Active pane border — moonfly primary blue, bold
+    activeBorderColor:
+      - '#80a0ff'
+      - bold
+    # Inactive pane borders — dark surface, barely visible
+    inactiveBorderColor:
+      - '#323437'
+    # Border color when in search mode
+    searchingActiveBorderColor:
+      - '#79dac8' # cyan
+      - bold
+    # Bottom options text (keybind hints)
+    optionsTextColor:
+      - '#74b2ff' # br_blue — readable but not dominant
+    # Selected line background in lists
+    selectedLineBgColor:
+      - '#1a1a1a' # slightly lifted above #080808 bg
+    # Selected line with no background support (fallback)
+    selectedRangeBgColor:
+      - '#323437' # surface
+    # Cherry-picked commits
+    cherryPickedCommitBgColor:
+      - '#323437'
+    cherryPickedCommitFgColor:
+      - '#cf87e8' # magenta
+    # Unstaged/untracked changes — red
+    unstagedChangesColor:
+      - '#ff5454'
+    # Default foreground (branch names, file names, etc.)
+    defaultFgColor:
+      - '#bdbdbd'
+  # Nerd Font support — use icons in the UI
+#  nerdFontsVersion: "3"
+  # Mouse disabled — keyboard-driven workflow
+#  mouseEvents: false
+  # Side panel width (proportion of screen)
+#  sidePanelWidth: 0.3
+  # Show bottom line of keybind hints
+#  showBottomLine: true
+  # Show command log
+#  showCommandLog: false
+  # Expand focused side panel
+#  expandFocusedSidePanel: false
+#git:
+  # Auto-fetch in background
+#  autoFetch: true
+#  autoFetchInterval: 60
+  # Paging — use delta if available, else diff-so-fancy, else plain
+#  paging:
+#    colorArg: always
+#    pager: delta --dark --line-numbers
+  # Show commit graph in log
+#  log:
+#    showGraph: 'whenMaximised'
+#    showWholeGraph: false
+  # Commit prefix template (empty = no forced prefix)
+#  commitPrefix:
+#    - pattern: ''
+#      replace: ''
+#keybinding:
+#  universal:
+#    quit: 'q'
+#    quit-alt1: '<c-c>'
+#    return: '<esc>'
+#    quitWithoutChangingDirectory: 'Q'
+#    togglePanel: '<tab>'
+#    prevItem: '<up>'
+#    nextItem: '<down>'
+#    prevItem-alt: 'k'
+#    nextItem-alt: 'j'
+#    prevPage: ','
+#    nextPage: '.'
+#    gotoTop: '<'
+#    scrollLeft: 'H'
+#    scrollRight: 'L'
+#    prevBlock: '<left>'
+#    nextBlock: '<right>'
+#    prevBlock-alt: 'h'
+#    nextBlock-alt: 'l'
+#    jumpToBlock:
+#      - '1'
+#      - '2'
+#      - '3'
+#      - '4'
+#      - '5'
+#    nextMatch: 'n'
+#    prevMatch: 'N'
+#    startSearch: '/'
+#    optionMenu: <disabled>
+#    optionMenu-alt1: '?'
+#    select: '<space>'
+#    goInto: 'l'
+#    confirm: '<enter>'
+#    remove: 'd'
+#    new: 'n'
+#    edit: 'e'
+#    openFile: 'o'
+#    refresh: 'r'
+#    pushFiles: 'P'
+#    pullFiles: 'p'
+#    scrollUpMain: '<pgup>'
+#    scrollDownMain: '<pgdn>'
+#    scrollUpMain-alt1: 'K'
+#    scrollDownMain-alt1: 'J'
+#    executeShellCommand: ':'
+#    createRebaseOptionsMenu: 'm'
+#    copy: 'y'
+#    submitEditorInfo: '<enter>'
+#    extrasMenu: '@'
+#    undo: 'z'
+#    copyToClipboard: '<c-o>'
+#    openDiffTool: <disabled>
+#    filteringMenu: '<c-s>'
