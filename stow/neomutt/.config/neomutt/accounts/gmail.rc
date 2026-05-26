@@ -1,0 +1,19 @@
+# ~/.config/neomutt/accounts/gmail.rc
+
+set realname  = "Adam Dickison"
+set from      = "adam.dickison@gmail.com"
+set sendmail  = "msmtp --account=gmail"
+
+set folder    = ~/.local/mail/adam.dickison@gmail.com
+
+set spoolfile = +INBOX
+set record    = "+[Gmail]/Sent Mail"   # only exists under [Gmail]
+set postponed = +Drafts                # top-level duplicate is fine for drafts
+set trash     = +Trash                 # top-level duplicate is fine for trash
+
+named-mailboxes "── Gmail ───────────" +INBOX
+named-mailboxes "  Inbox"              +INBOX
+named-mailboxes "  Drafts"             +Drafts
+named-mailboxes "  Sent"               "+[Gmail]/Sent Mail"
+named-mailboxes "  Trash"              +Trash
+named-mailboxes "  Spam"               +Spam

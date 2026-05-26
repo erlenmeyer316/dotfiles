@@ -1,0 +1,14 @@
+# ~/.config/neomutt/mailcap
+# Tells neomutt how to render/open each MIME type
+
+# HTML: render inline via w3m — copiousoutput means pipe through pager
+text/html; w3m -I %{charset} -T text/html -dump; copiousoutput
+
+# Images: open with feh on demand (from attachment view)
+image/*; feh %s
+
+# PDF: open with a pager-friendly text dump, or feh-style viewer
+application/pdf; zathura %s
+
+# Fallback: try xdg-open for anything else
+application/*; xdg-open %s

@@ -1,0 +1,11 @@
+# ~/.config/neomutt/sidebar.rc
+
+set sidebar_visible       = yes
+set sidebar_width         = 28
+set sidebar_short_path    = yes                  # trim leading path components
+set sidebar_delim_chars   = "/"                  # folder hierarchy delimiter
+set sidebar_folder_indent = yes                  # indent subfolders
+set sidebar_indent_string = "  "
+set sidebar_format        = "%B%* %?N?(%N)?%?F?[%F]?" 
+                                                 # name, unread count, flagged count
+set sidebar_new_mail_only = no                   # show all folders, not just new

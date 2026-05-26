@@ -1,0 +1,33 @@
+# ~/.config/neomutt/accounts/posteo.rc
+
+set realname  = "Adam Dickison"
+set from      = "adam.dickison@posteo.net"
+set sendmail  = "msmtp --account=posteo"
+
+set folder    = ~/.local/mail/adam.dickison@posteo.net
+
+set spoolfile = +INBOX
+set record    = +Sent
+set postponed = +Drafts
+set trash     = +Trash
+
+# ── Core ──────────────────────────────────────────────────────────────────────
+named-mailboxes "── Posteo ──────────" +INBOX
+named-mailboxes "  Inbox"              +INBOX
+named-mailboxes "  Drafts"             +Drafts
+named-mailboxes "  Sent"               +Sent
+named-mailboxes "  Archive"            +Archive
+named-mailboxes "  Trash"              +Trash
+named-mailboxes "  Spam"               +Spam
+named-mailboxes "  Junk"               +Junk
+named-mailboxes "  Spam-Log"           +Spam-Log
+# ── Folders ───────────────────────────────────────────────────────────────────
+# Subfolders with spaces (e.g. Financial/Chase Bank) are accessible via
+# the folder browser: press 'c' then '?' to browse into any parent folder
+named-mailboxes "── Folders ─────────" +INBOX
+named-mailboxes "  Financial"          +Financial
+named-mailboxes "  Homeserver"         +Homeserver
+named-mailboxes "  Newsletters"        +Newsletters
+named-mailboxes "  Orders"             +Orders
+named-mailboxes "  Unsorted"           +Unsorted
+named-mailboxes "  Vacation"           +Vacation

@@ -1,58 +1,21 @@
-## Neomutt configuration file located at ~/.config/neomutt/neomuttrc
-set from='adam.dickison@posteo.net'
-set realname='First Last'
-set sendmail = "/usr/bin/msmtp -a posteo"
-set sendmail_wait = 0
-unset record
+# ~/.config/neomutt/neomuttrc
+# Entry point — sources all modules in order
 
-set header_cache='~/.cache/neomutt/headers'
-set message_cachedir='~/.cache/neomutt/bodies'
-set certificate_file='~/.cache/neomutt/certificates'
+source ~/.config/neomutt/behavior.rc
+source ~/.config/neomutt/sidebar.rc
+source ~/.config/neomutt/bindings.rc
 
-# My mailboxes
-set folder ='~/.local/mail/posteo'
-set spoolfile='+INBOX'
-set postponed='+Drafts'
-set record='+Sent'
-set trash='+Trash'
-mailboxes 
+# Load default account (Posteo)
+source ~/.config/neomutt/accounts/posteo.rc
 
-# Personal preferences
-set date_format="%y/%m/%d %I:%M%p"
-set editor='nvim'
-set sort=threads
-set sort='reverse-date'
-set forward_format = "Fwd: %s"
-set include
-
-# Setup khard for address book
-set query_command= "khard email --parsable %s"
-bind editor <Tab> complete-query
-bind editor ^T complete
-
-# Set key bindings
-bind compose p postpone-message
-bind index p recall-message
-macro index G "!mbsync -a -c ~/.config/isync//.mbsyncrc^M" "Update through mbsync"
-
-# Sidebar settings
-set sidebar_visible=yes
-set sidebar_width=20
-set sidebar_short_path = yes
-set sidebar_next_new_wrap = yes
-set mail_check_stats
-#set sidebar_format = '%B%?F? [%F]?%* %?N?%N/?%S'
-bind index,pager \Ck sidebar-prev
-bind index,pager \Cj sidebar-next
-bind index,pager \Co sidebar-open
-bind index,pager \Cp sidebar-prev-new
-bind index,pager \Cn sidebar-next-new
-bind index,pager B sidebar-toggle-visible
-
-# HTML settings
+# HTML rendering via w3m
 set mailcap_path = ~/.config/neomutt/mailcap
+auto_view text/html                              # render HTML automatically
 alternative_order text/plain text/enriched text/html
-macro attach 'V' "<pipe-entry>iconv -c --to-code=UTF-8 > ~/.cache/neomutt/neomail.html<enter><shell-escape>$BROWSER ~/.cache/neomutt/neomail.html<enter>"
+                                                 # prefer plain text, fall back to HTML
 
-source colors.neomuttrc
+# khard address book query
+set query_command = "khard email --parsable '%s'"
 
+# Auto-sync all accounts on startup by pushing the sync macro
+startup-hook 'push "gs"'

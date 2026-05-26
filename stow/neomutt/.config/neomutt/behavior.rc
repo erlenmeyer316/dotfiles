@@ -1,0 +1,47 @@
+# ~/.config/neomutt/behaviour.rc
+
+# ── Editor ────────────────────────────────────────────────────────────────────
+set editor        = nvim                         # compose in neovim
+set edit_headers  = yes                          # edit To/CC/Subject in nvim buffer
+
+# ── Folders & mailbox type ────────────────────────────────────────────────────
+set mbox_type     = Maildir                      # local mail is Maildir format
+
+# ── Sorting ───────────────────────────────────────────────────────────────────
+set sort          = threads                      # group by thread
+set sort_aux      = reverse-last-date-received   # newest thread on top
+set sort_re                                      # thread by Re: subject matching
+
+# ── Reading ───────────────────────────────────────────────────────────────────
+set pager_index_lines = 10                       # show 10 index lines above pager
+set pager_context     = 3                        # lines of context when paging
+set pager_stop                                   # don't move to next message at end
+set menu_scroll                                  # scroll menus rather than wrap
+set tilde                                        # fill short messages with ~
+unset markers                                    # no + markers on wrapped lines
+
+# ── Composing ─────────────────────────────────────────────────────────────────
+set envelope_from                                # derive From: from account config
+set sig_dashes                                   # -- before signature
+set forward_format = "Fwd: %s"
+set mime_forward   = ask-no                      # ask whether to forward as MIME
+
+# ── Deletion & expunge ────────────────────────────────────────────────────────
+set delete  = yes                                # mark deleted immediately, no prompt
+
+# ── Index display ─────────────────────────────────────────────────────────────
+set date_format   = "%d %b %Y"
+set index_format  = "%4C %Z  %D  %-20.20F  %s"  # #, flags, date, sender, subject
+
+# ── Caching ───────────────────────────────────────────────────────────────────
+set header_cache     = ~/.cache/neomutt/headers  # cache headers for speed
+set message_cachedir = ~/.cache/neomutt/messages # cache message bodies
+set header_cache_backend = lmdb                  # fast header cache backend
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+set wait_key    = no                             # don't prompt after external commands
+set timeout     = 10                             # check for mail every 10s
+set mail_check  = 5
+unset beep_new                                   # no beep on new mail
+set pipe_decode                                  # decode when piping messages
+set thorough_search                              # decode before searching

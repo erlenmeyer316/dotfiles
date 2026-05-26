@@ -41,5 +41,5 @@ Subfolders Verbatim
 Channel gmail
 Far :gmail-remote:
 Near :gmail-local:
-Patterns * !"[Gmail]/All Mail" !"[Gmail]/Important" !"[Gmail]/Starred" !"[Gmail]/Bin"
+Patterns * !"[Gmail]/All\ Mail" !"[Gmail]/Important" !"[Gmail]/Starred" !"[Gmail]/Bin"
 
