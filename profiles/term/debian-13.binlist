@@ -1,9 +1,12 @@
 apt:isync
 apt:keepassxc
+apt:khard
 apt:libsecret-tools
 apt:lynx
+apt:msmtp
 apt:nala
 apt:neomutt
+apt:notmuch
 apt:python3-bs4
 apt:python3-pip
 apt:starship
@@ -14,5 +17,3 @@ apt:w3m-img
 apt:xclip
 apt:xsel
 apt:zoxide
-apt:khard
-apt:msmtp

@@ -4,6 +4,7 @@ apt:libsecret-tools
 apt:lynx
 apt:nala
 apt:neomutt
+apt:notmuch
 apt:python3-bs4
 apt:python3-pip
 apt:starship
