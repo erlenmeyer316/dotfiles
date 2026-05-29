@@ -1,4 +1,6 @@
 apt:isync
+apt:syncthing
+apt:keyutils
 apt:keepassxc
 apt:libsecret-tools
 apt:lynx

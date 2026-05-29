@@ -17,3 +17,5 @@ apt:w3m-img
 apt:xclip
 apt:xsel
 apt:zoxide
+apt:syncthing
+apt:keyutils
