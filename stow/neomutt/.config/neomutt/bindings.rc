@@ -16,7 +16,6 @@ bind index <Return>  display-message
 # ── Index: actions ────────────────────────────────────────────────────────────
 bind index d         delete-message           # mark deleted, no prompt
 bind index u         undelete-message         # unmark if you change your mind
-bind index s         save-message             # move to folder
 bind index r         reply
 bind index R         group-reply              # reply all
 bind index f         forward-message
@@ -28,6 +27,14 @@ bind index zA        collapse-all
 bind index /         search
 bind index n         search-next
 bind index \$        sync-mailbox             # expunge deleted in current folder
+
+# ── Move / delete ───────────────────────────────────────────────────────────────
+# tag-prefix-cond: if messages are tagged, apply to all tagged;
+# if nothing is tagged, apply to current message only.
+# This means 's' always does what you expect in both cases.
+
+macro index s "<tag-prefix-cond><save-message>" "Move message(s) to folder"
+macro pager s "<tag-prefix-cond><save-message>" "Move message(s) to folder"
 
 # ── Index: account switching ──────────────────────────────────────────────────
 macro index 1 \
