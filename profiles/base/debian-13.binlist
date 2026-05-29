@@ -1,4 +1,5 @@
 apt:bat
+apt:yazi
 apt:jq
 apt:btop
 apt:build-essential
