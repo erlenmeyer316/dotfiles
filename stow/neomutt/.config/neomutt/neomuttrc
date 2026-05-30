@@ -11,8 +11,12 @@ source ~/.config/neomutt/accounts/posteo.rc
 # HTML rendering via w3m
 set mailcap_path = ~/.config/neomutt/mailcap
 auto_view text/html                              # render HTML automatically
-alternative_order text/plain text/enriched text/html
-                                                 # prefer plain text, fall back to HTML
+alternative_order text/plain text/enriched text/html # prefer plain text, fall back to HTML
+
+# Enable virtual mailboxes for notmuch search results
+set virtual_spoolfile = no
+set nm_default_url    = "notmuch:///home/erlenmeyer316/.local/mail"
+set nm_query_type     = threads          # return whole threads, not individual messages
 
 # khard address book query
 set query_command = "khard email --parsable '%s'"

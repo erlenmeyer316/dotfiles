@@ -36,6 +36,19 @@ bind index \$        sync-mailbox             # expunge deleted in current folde
 macro index s "<tag-prefix-cond><save-message>" "Move message(s) to folder"
 macro pager s "<tag-prefix-cond><save-message>" "Move message(s) to folder"
 
+
+# ── notmuch search ────────────────────────────────────────────────────────────
+bind index \\ noop                       # free up backslash if used elsewhere
+macro index S \
+    "<enter-command>unset wait_key<enter>\
+<shell-escape>echo -n 'notmuch query: '; read q; echo \$q > /tmp/nm_query<enter>\
+<change-vfolder>?<enter>" \
+    "Search all mail via notmuch"
+
+# Cleaner approach — uses neomutt's built-in notmuch prompt:
+#bind index \031 vfolder-from-query       # Ctrl-s — opens notmuch query prompt
+
+
 # ── Index: account switching ──────────────────────────────────────────────────
 macro index 1 \
     "<enter-command>source ~/.config/neomutt/accounts/posteo.rc<enter>\

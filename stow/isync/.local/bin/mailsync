@@ -1,0 +1,15 @@
+# ~/.local/bin/mailsync
+#!/usr/bin/env bash
+# Sync all mail accounts and re-index with notmuch
+# Requires kp keyring to be warm — run 'kp unlock' first or
+# this will fail if called non-interactively
+
+set -euo pipefail
+
+echo "Syncing mail..."
+mbsync -a -c "${XDG_CONFIG_HOME:-$HOME/.config}/isyncrc"
+
+echo "Indexing..."
+notmuch new
+
+echo "Done."

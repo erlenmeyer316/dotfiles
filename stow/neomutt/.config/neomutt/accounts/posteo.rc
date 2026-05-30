@@ -31,3 +31,5 @@ named-mailboxes "  Newsletters"        +Newsletters
 named-mailboxes "  Orders"             +Orders
 named-mailboxes "  Unsorted"           +Unsorted
 named-mailboxes "  Vacation"           +Vacation
+
+source ~/.config/neomutt/themes/posteo.rc

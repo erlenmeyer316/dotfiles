@@ -17,3 +17,5 @@ named-mailboxes "  Drafts"             +Drafts
 named-mailboxes "  Sent"               "+[Gmail]/Sent Mail"
 named-mailboxes "  Trash"              +Trash
 named-mailboxes "  Spam"               +Spam
+
+source ~/.config/neomutt/themes/gmail.rc
