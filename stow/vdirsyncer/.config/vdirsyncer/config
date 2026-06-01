@@ -1,18 +1,16 @@
 [general]
 # Folder where vdirsyncer can store some metadata about each pair.
-#status_path = "~/.local/share/vdirsyncer/status/"
-status_path = "~/.cache/vdirsyncer/status/"
+status_path = "~/.local/share/vdirsyncer/status/"
 
-# CardDAV
+# Posteo Contacts
 [pair posteo_contacts]
 a = "posteo_contacts_local"
 b = "posteo_contacts_remote"
 collections = ["from a", "from b"]
 
-# metadata = ["displayname"]
+metadata = ["displayname"]
 
 [storage posteo_contacts_local]
-# Storage references actual data on a remote server or on the local disk.
 type = "filesystem"
 path = "~/.local/contacts/adam.dickison@posteo.net"
 fileext = ".vcf"
@@ -24,28 +22,29 @@ username = "adam.dickison@posteo.net"
 password.fetch = ["command", "kp", "get", "mail/posteo.de"]
 read_only = true
 
+# Posteo Calendar
 [pair posteo_calendars]
 a = "posteo_calendar_local"
 b = "posteo_calendar_remote"
-collections = ["from b"]          # auto-discover all calendars on server
-conflict_resolution = "b wins"    # server is source of truth on conflict
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
 
 [storage posteo_calendar_local]
 type = "filesystem"
-path = "~/.local/share/calendars/posteo/"
+path = "~/.local/share/calendars/adam.dickison@posteo.net/"
 fileext = ".ics"
 
 [storage posteo_calendar_remote]
 type = "caldav"
-url = "https://posteo.de:8443/calendars/adam.dickison@posteo.net/"
+url = "https://posteo.de:8443/calendars/adam.dickison/default/"
 username = "adam.dickison@posteo.net"
 password.fetch = ["command", "kp", "get", "mail/posteo.de"]
-# ── Read-only subscriptions (ICS feeds) ──────────────────────────────────────
 
+# US Holiday Calendar
 [pair holidays]
 a = "holidays_local"
 b = "holidays_remote"
-collections = null               # single collection, not a CalDAV account
+collections = null
 
 [storage holidays_local]
 type = "filesystem"
@@ -54,5 +53,4 @@ fileext = ".ics"
 
 [storage holidays_remote]
 type = "http"
-url = "https://www.mozilla.org/media/caldata/USHolidays.ics"
-# Replace with any public ICS feed URL — works for sports, public holidays, etc.
+url = "https://www.thunderbird.net/media/caldata/autogen/USHolidays.ics"

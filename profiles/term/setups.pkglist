@@ -1,8 +1,9 @@
 base
-term
-neomutt
 isync
-vdirsyncer
-syncthing
-yazi
 khal
+khard
+neomutt
+syncthing
+term
+vdirsyncer
+yazi

@@ -4,20 +4,20 @@
 path = ~/.local/share/calendars/posteo/*    # glob catches all discovered collections
 color = #8be9fd                             # Dracula cyan
 
-[[holidays]]
-path = ~/.local/share/calendars/holidays/
-color = #ff79c6                             # Dracula pink
-readonly = True                             # prevents accidental edits to subscription
+#[[holidays]]
+#path = ~/.local/share/calendars/holidays/
+#color = #ff79c6                             # Dracula pink
+#readonly = True                             # prevents accidental edits to subscription
 
 [sqlite]
 path = ~/.local/share/khal/khal.db          # fast local index
 
 [locale]
-timeformat = %H:%M                          # 24h
-dateformat = %Y-%m-%d
-longdateformat = %A, %Y-%m-%d
-datetimeformat = %Y-%m-%d %H:%M
-longtimeformat = %H:%M:%S
+timeformat = %I:%M %p              
+dateformat = %d/%m/%Y
+longdateformat = "%A, %B %d. %Y"
+datetimeformat = %d/%m/%Y %I:%M
+longtimeformat = %I:%M:%S %p
 weeknumbers = False
 firstweekday = 0                            # Monday
 
