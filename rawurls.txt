@@ -39,8 +39,11 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/nerdfonts/po
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/nvm/pre-install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/st/pre-install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/syncthing/post-install.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/syncthing/pre-install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/term/post-install.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/vdirsyncer/post-install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/vdirsyncer/pre-link.sh
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/setup/yazi/pre-install.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/bash/.bash_logout
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/bash/.bashrc
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/bash/.config/bash/aliases.d/bash.bash
@@ -74,10 +77,15 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/grep/.config/
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/i3-kiosk/.config/i3/config
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/i3-kiosk/.xinitrc
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/isync/.config/isyncrc
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/isync/.local/bin/mailsync
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/keepassxc/.config/bash/aliases.d/keepassxc.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/keepassxc/.config/kp/config
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/keepassxc/.config/kp/kp-core.sh
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/keepassxc/.local/bin/kp
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/khal/.config/bash/aliases.d/khal.bash
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/khal/.config/khal/config
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/khal/.config/systemd/user/vdirsyncer.service
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/khal/.config/systemd/user/vdirsyncer.timer
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/khard/.config/khard/khard.conf
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/lazygit/.config/bash/aliases.d/lazygit.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/lazygit/.config/lazygit/config.yml
@@ -92,6 +100,8 @@ https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.conf
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.config/neomutt/mailcap
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.config/neomutt/neomuttrc
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.config/neomutt/sidebar.rc
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.config/neomutt/themes/gmail.rc
+https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neomutt/.config/neomutt/themes/posteo.rc
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/neovim/.config/bash/aliases.d/neovim.bash
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/notmuch/.notmuch-config
 https://raw.githubusercontent.com/erlenmeyer316/dotfiles/main/stow/nvm/.config/bash/completions.d/nvm.bash
