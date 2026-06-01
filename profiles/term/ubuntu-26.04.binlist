@@ -1,4 +1,7 @@
 apt:isync
+apt:khal
+apt:yazi
+apt:urlscan
 apt:syncthing
 apt:keyutils
 apt:keepassxc

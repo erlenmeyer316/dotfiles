@@ -1,5 +1,9 @@
 apt:isync
+apt:khal
+apt:urlscan
+apt:yazi
 apt:keepassxc
+apt:keyutils
 apt:khard
 apt:libsecret-tools
 apt:lynx
@@ -10,6 +14,7 @@ apt:notmuch
 apt:python3-bs4
 apt:python3-pip
 apt:starship
+apt:syncthing
 apt:tmux
 apt:vdirsyncer
 apt:w3m
@@ -17,5 +22,3 @@ apt:w3m-img
 apt:xclip
 apt:xsel
 apt:zoxide
-apt:syncthing
-apt:keyutils
