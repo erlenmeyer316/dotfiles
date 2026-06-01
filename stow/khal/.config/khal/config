@@ -1,7 +1,7 @@
 [calendars]
 
 [[posteo]]
-path = ~/.local/share/calendars/posteo/*    # glob catches all discovered collections
+path = ~/.local/share/calendars/adam.dickison@posteo.net/default/    # glob catches all discovered collections
 color = #8be9fd                             # Dracula cyan
 
 #[[holidays]]
@@ -13,13 +13,11 @@ color = #8be9fd                             # Dracula cyan
 path = ~/.local/share/khal/khal.db          # fast local index
 
 [locale]
-timeformat = %I:%M %p              
-dateformat = %d/%m/%Y
-longdateformat = "%A, %B %d. %Y"
-datetimeformat = %d/%m/%Y %I:%M
-longtimeformat = %I:%M:%S %p
-weeknumbers = False
-firstweekday = 0                            # Monday
+timeformat = %H:%M
+dateformat = %Y-%m-%d
+longdateformat = "%A, %Y-%m-%d"
+datetimeformat = %Y-%m-%d %H:%M
+firstweekday = 0
 
 [view]
 # 'full' shows the full week in the interactive view

@@ -53,4 +53,4 @@ fileext = ".ics"
 
 [storage holidays_remote]
 type = "http"
-url = "https://www.thunderbird.net/media/caldata/autogen/USHolidays.ics"
+url = "https://ics.calendarlabs.com/76/661933dc/US_Holidays.ics"
