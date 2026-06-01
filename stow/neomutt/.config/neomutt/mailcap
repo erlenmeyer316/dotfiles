@@ -12,3 +12,6 @@ application/pdf; zathura %s
 
 # Fallback: try xdg-open for anything else
 application/*; xdg-open %s
+
+# Links: render links in email
+text/plain; urlscan; needsterminal

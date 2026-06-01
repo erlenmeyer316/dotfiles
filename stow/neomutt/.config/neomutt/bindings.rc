@@ -39,14 +39,20 @@ macro pager s "<tag-prefix-cond><save-message>" "Move message(s) to folder"
 
 # ── notmuch search ────────────────────────────────────────────────────────────
 bind index \\ noop                       # free up backslash if used elsewhere
-macro index S \
-    "<enter-command>unset wait_key<enter>\
-<shell-escape>echo -n 'notmuch query: '; read q; echo \$q > /tmp/nm_query<enter>\
-<change-vfolder>?<enter>" \
-    "Search all mail via notmuch"
+#macro index S \
+#    "<enter-command>unset wait_key<enter>\
+#<shell-escape>echo -n 'notmuch query: '; read q; echo \$q > /tmp/nm_query<enter>\
+#<change-vfolder>?<enter>" \
+#    "Search all mail via notmuch"
+#
 
 # Cleaner approach — uses neomutt's built-in notmuch prompt:
-#bind index \031 vfolder-from-query       # Ctrl-s — opens notmuch query prompt
+bind index \S vfolder-from-query       # Ctrl-s — opens notmuch query prompt
+
+# URL handling
+macro index,pager U \
+    "<pipe-message>urlscan<enter>" \
+    "Extract and follow URLs"
 
 
 # ── Index: account switching ──────────────────────────────────────────────────
