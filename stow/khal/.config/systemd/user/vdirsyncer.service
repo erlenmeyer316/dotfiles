@@ -3,4 +3,8 @@ Description=vdirsyncer calendar sync
 
 [Service]
 Type=oneshot
+Environment=PATH=/home/erlenmeyer316/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=/usr/bin/vdirsyncer sync
+
+[Install]
+WantedBy=default.target
