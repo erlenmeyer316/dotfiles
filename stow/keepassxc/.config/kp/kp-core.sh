@@ -21,21 +21,40 @@ KP_CLIP_TIMEOUT="${KP_CLIP_TIMEOUT:-10}"
 KP_KEYRING_SERVICE="${KP_KEYRING_SERVICE:-kp}"
 KP_KEYRING_ACCOUNT="${KP_KEYRING_ACCOUNT:-master}"
 
+# Kernel keyring key name — derived from service/account for uniqueness
+_KP_KERNEL_KEY="${KP_KEYRING_SERVICE}:${KP_KEYRING_ACCOUNT}"
+
 # ── Debug mode ────────────────────────────────────────────────────────────────
 # Enable with KP_DEBUG=1 or by running: kp debug <command> [entry]
-# Strips -q and 2>/dev/null so keepassxc-cli speaks freely.
+# Strips 2>/dev/null so keepassxc-cli speaks freely.
 # Also prints the resolved config and exact command being run.
 
 _kp_debug_info() {
+    # Check each keyring backend independently to avoid stdout concatenation
+    local kernel_cached=no secret_cached=no
+    if command -v keyctl >/dev/null 2>&1; then
+        local keyid
+        keyid=$(keyctl search @s user "$_KP_KERNEL_KEY" 2>/dev/null) \
+            && kernel_cached=yes
+    fi
+    if command -v secret-tool >/dev/null 2>&1; then
+        local val
+        val=$(secret-tool lookup \
+            "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null) \
+            && [[ -n "$val" ]] && secret_cached=yes
+    fi
+
     echo "── kp debug ─────────────────────────────────" >&2
     echo "  KP_DB              = ${KP_DB}" >&2
-    echo "  DB exists          = $(  [[ -f "$KP_DB" ]] && echo yes || echo NO — FILE NOT FOUND)" >&2
-    echo "  DB readable        = $([[ -r "$KP_DB" ]] && echo yes || echo NO — PERMISSION DENIED)" >&2
+    echo "  DB exists          = $([[ -f "$KP_DB" ]] && echo yes || echo 'NO — FILE NOT FOUND')" >&2
+    echo "  DB readable        = $([[ -r "$KP_DB" ]] && echo yes || echo 'NO — PERMISSION DENIED')" >&2
     echo "  keepassxc-cli      = $(command -v keepassxc-cli 2>/dev/null || echo NOT FOUND)" >&2
     echo "  keepassxc-cli ver  = $(keepassxc-cli --version 2>&1 || echo unknown)" >&2
+    echo "  keyctl             = $(command -v keyctl 2>/dev/null || echo 'not found — install keyutils')" >&2
     echo "  secret-tool        = $(command -v secret-tool 2>/dev/null || echo not found)" >&2
     echo "  KP_PASS set        = $([[ -n "${KP_PASS:-}" ]] && echo yes || echo no)" >&2
-    echo "  Keyring cached     = $(secret-tool lookup "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null && echo yes || echo no)" >&2
+    echo "  Kernel keyring     = ${kernel_cached}" >&2
+    echo "  GNOME keyring      = ${secret_cached}" >&2
     echo "─────────────────────────────────────────────" >&2
 }
 
@@ -49,11 +68,59 @@ _kp_require() {
     done
 }
 
+# ── Kernel keyring helpers ────────────────────────────────────────────────────
+# Uses the Linux kernel session keyring (@s) — no daemon required, works on
+# TTY and X11 equally. Session keyring is automatically cleared on logout.
+# Requires: keyutils (apt install keyutils)
+
+_kp_kernel_get() {
+    command -v keyctl >/dev/null 2>&1 || return 1
+    local keyid
+    keyid=$(keyctl search @s user "$_KP_KERNEL_KEY" 2>/dev/null) || return 1
+    keyctl print "$keyid" 2>/dev/null
+}
+
+_kp_kernel_set() {
+    command -v keyctl >/dev/null 2>&1 || return 1
+    keyctl add user "$_KP_KERNEL_KEY" "$1" @s >/dev/null 2>&1
+}
+
+_kp_kernel_clear() {
+    command -v keyctl >/dev/null 2>&1 || return 1
+    keyctl purge user "$_KP_KERNEL_KEY" >/dev/null 2>&1 || true
+}
+
+# ── Secret-tool helpers ───────────────────────────────────────────────────────
+# libsecret / GNOME keyring — works on X11 sessions with the daemon running.
+# Falls back silently on TTY-only systems where the daemon is absent.
+
+_kp_secret_get() {
+    command -v secret-tool >/dev/null 2>&1 || return 1
+    local val
+    val=$(secret-tool lookup \
+        "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null) || return 1
+    [[ -n "$val" ]] && echo "$val"
+}
+
+_kp_secret_set() {
+    command -v secret-tool >/dev/null 2>&1 || return 1
+    echo -n "$1" | secret-tool store \
+        --label="kp master password" \
+        "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null
+}
+
+_kp_secret_clear() {
+    command -v secret-tool >/dev/null 2>&1 || return 1
+    secret-tool clear \
+        "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null || true
+}
+
 # ── Master password supply ────────────────────────────────────────────────────
 # Resolution order:
-#   1. KP_PASS env var  — explicit override, never cached, for scripted use
-#   2. System keyring   — session-cached after first interactive unlock
-#   3. Interactive prompt — with offer to cache in keyring
+#   1. KP_PASS env var       — explicit override, never cached, for scripts
+#   2. Kernel keyring        — TTY-native, session-scoped, no daemon needed
+#   3. secret-tool           — X11/GNOME keyring fallback
+#   4. Interactive prompt    — cache offer on successful entry
 #
 # Password emitted on stdout. All user-facing messages go to stderr
 # so stdout stays clean for piping into keepassxc-cli.
@@ -65,18 +132,20 @@ _kp_get_master() {
         return 0
     fi
 
-    # 2. System keyring
-    if command -v secret-tool >/dev/null 2>&1; then
-        local cached
-        cached=$(secret-tool lookup \
-            "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null || true)
-        if [[ -n "$cached" ]]; then
-            echo "$cached"
-            return 0
-        fi
-    fi
+    # 2. Kernel keyring
+    local cached
+    cached=$(_kp_kernel_get 2>/dev/null) && [[ -n "$cached" ]] && {
+        echo "$cached"
+        return 0
+    }
 
-    # 3. Interactive prompt — requires a tty
+    # 3. secret-tool (X11 sessions)
+    cached=$(_kp_secret_get 2>/dev/null) && [[ -n "$cached" ]] && {
+        echo "$cached"
+        return 0
+    }
+
+    # 4. Interactive prompt — requires a tty
     if [[ ! -t 0 ]] && [[ ! -e /dev/tty ]]; then
         echo "kp: no master password available and no tty for prompt" >&2
         echo "kp: run 'kp unlock' in your session first, or set KP_PASS" >&2
@@ -87,14 +156,25 @@ _kp_get_master() {
     read -rsp "KeePass master password: " pw </dev/tty
     echo >&2   # newline after silent read
 
-    if command -v secret-tool >/dev/null 2>&1; then
-        local store
-        read -rp "Cache in keyring for this session? [y/N] " store </dev/tty
-        if [[ "$store" =~ ^[Yy]$ ]]; then
-            echo -n "$pw" | secret-tool store \
-                --label="kp master password" \
-                "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null
-            echo "kp: cached in keyring. Run 'kp lock' to evict." >&2
+    if [[ -z "$pw" ]]; then
+        echo "kp: no password entered" >&2
+        return 1
+    fi
+
+    # Offer to cache — prefer kernel keyring, fall back to secret-tool
+    local store
+    read -rp "Cache in keyring for this session? [y/N] " store </dev/tty
+    if [[ "$store" =~ ^[Yy]$ ]]; then
+        if command -v keyctl >/dev/null 2>&1; then
+            _kp_kernel_set "$pw" \
+                && echo "kp: cached in kernel keyring. Run 'kp lock' to evict." >&2 \
+                || echo "kp: kernel keyring cache failed." >&2
+        elif command -v secret-tool >/dev/null 2>&1; then
+            _kp_secret_set "$pw" \
+                && echo "kp: cached in GNOME keyring. Run 'kp lock' to evict." >&2 \
+                || echo "kp: GNOME keyring cache failed — is the daemon running?" >&2
+        else
+            echo "kp: no keyring backend available (install keyutils for kernel keyring)." >&2
         fi
     fi
 
@@ -102,11 +182,9 @@ _kp_get_master() {
 }
 
 # ── keepassxc-cli runner ──────────────────────────────────────────────────────
-# Pipes master password into keepassxc-cli.
-#
-# -q (--quiet) is a global flag that silences the password prompt and
-# secondary output. It MUST precede the subcommand — placing it after
-# positional args is silently ignored (was the original bug).
+# Pipes master password into keepassxc-cli via stdin.
+# stderr suppressed to silence the password prompt on non-debug runs.
+# Note: -q intentionally omitted — in 2.7.x it suppresses stdin reads.
 #
 # Usage: _kp_cli <subcommand> [subcommand-options] <db> [entry]
 
@@ -120,7 +198,7 @@ _kp_cli() {
         echo "  password length    = ${#pw}" >&2
         echo "  running: keepassxc-cli $*" >&2
         echo "─────────────────────────────────────────────" >&2
-        # Run without -q and without stderr suppression so we see everything
+        # Run without stderr suppression so we see everything
         echo "$pw" | keepassxc-cli "$@"
     else
         echo "$pw" | keepassxc-cli "$@" 2>/dev/null

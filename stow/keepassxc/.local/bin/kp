@@ -61,10 +61,15 @@ cmd_unlock() {
 
 cmd_lock() {
     if command -v secret-tool >/dev/null 2>&1; then
-        secret-tool clear "$KP_KEYRING_SERVICE" "$KP_KEYRING_ACCOUNT" 2>/dev/null
+        _kp_secret_clear
         echo "kp: keyring cache cleared."
     else
-        echo "kp: no keyring backend; unset KP_PASS if set manually." >&2
+        if command -v keyctl >/dev/null 2>&1; then
+            _kp_kernel_clear
+            echo "kp: keyring cache cleared."
+        else
+            echo "kp: no keyring backend; unset KP_PASS if set manually." >&2
+        fi
     fi
 }
 
