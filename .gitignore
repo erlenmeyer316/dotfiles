@@ -2,3 +2,5 @@ stow/tmux/.tmux/plugins/*
 stow/w3m/.config/w3m/cookie
 stow/btop/.config/btop/btop.log
 stow/ranger/.config/ranger/colorschemes/__pycache__
+/stow/khal/.config/systemd/user/default.target.wants/syncthing.service
+/stow/khal/.config/systemd/user/timers.target.wants/vdirsyncer.timer
