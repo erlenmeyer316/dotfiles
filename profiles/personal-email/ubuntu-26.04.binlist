@@ -1,0 +1,7 @@
+apt:isync
+apt:msmtp
+apt:neomutt
+apt:notmuch
+apt:urlscan
+apt:w3m
+apt:w3m-img
